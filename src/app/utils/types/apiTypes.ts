@@ -1,0 +1,24 @@
+import { User } from "./entities";
+
+export type QueryConfig<T> = {
+    key: string;
+    path: string;
+    user?: User;
+    options?: Record<string, any>;
+};
+
+export interface AuthResponse {
+    message: string;
+    user: User;
+}
+
+export interface AuthFail {
+    error: string;
+}
+
+export interface ActionResponse {
+    message: string;
+    success?: boolean;
+    error?: unknown;
+}
+

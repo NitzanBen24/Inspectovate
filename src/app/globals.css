@@ -2,26 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Heebo', sans-serif !important;
+  }
+
+.bg-theme {
+    /* background-color: #dc782f; */
+    background-color:#dc782fcf;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+.app-header {
+  border-bottom: solid #f86f0f54;
+  /* #f86f0f; */
+}
+
+
+.form-body {
+  direction: rtl;
+}
+
+
+textarea[name="comments"] {
+  height: 320px;
+}
+
+.form-list,
+.archive-block {
+  direction: rtl;
+}
+
+.form-list-item {
+  font-size: 14px;
+}
+
+.form-list-item > span {
+  padding: 3px;
+  display: flex;
+  align-items: center;
+}
+
+.storage {
+  display: none;
+}
+
+.storage-toggle > svg {
+  position: relative;
+  right: 5px;
+}
+
+
+@media (min-width: 768px) {
+  .main-wrapp {
+    border: solid 1px #f86f0f54;
+    border-radius: 8px;
+    max-width: 750px;
+    /* margin-right: auto; */
+    margin: auto;
   }
 }
+
+
+@media (max-width: 768px) {
+  
+}
+
+
+/* .blur-item {
+  filter: blur(3px);
+} */

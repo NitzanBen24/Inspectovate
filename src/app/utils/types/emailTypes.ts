@@ -1,0 +1,15 @@
+
+
+export interface EmailInfo {
+    customer?: string;
+    provider?: string;
+    message?: string;
+    reciver?: string;
+    attachments? :any [];
+}
+
+export interface EmailResult {
+    success: boolean;
+    message: string;
+    error?: unknown;
+}
