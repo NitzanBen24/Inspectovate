@@ -9,7 +9,6 @@ import Main from './Main';
 const queryClient = new QueryClient();
 
 const App = () => {
-console.log('App.render')
     return (
         <QueryClientProvider client={queryClient}>
             <UserProvider>

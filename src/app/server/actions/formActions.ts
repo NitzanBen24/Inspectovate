@@ -1,26 +1,33 @@
 import { findPdfFile, getEnglishFormName, getQueryFields, isEmptyProps, validatePDFResult } from "@/app/utils/helper";
 import { getRole, getUserDetails } from "../lib/db/users";
-import { getAllPDF } from "../services/pdfService";
-import { getUserActiveForms, saveForm, sendForm } from "../services/formService";
+import { getAllPDF, getPDFs } from "../services/pdfService";
+import { fieldsToForm, getUserActiveForms, saveForm, sendForm } from "../services/formService";
 import { FormPayload } from "@/app/utils/types/formTypes";
 import { SearchData } from "@/app/utils/types/payloads";
 import { getSearchForms } from "../lib/db/forms";
-import { fieldsToForm } from "../lib/formatData";
+import { getCompanyInfo } from "../lib/db/dbObject";
 
 
-export async function getFormsDataByUserId(userId : string): Promise<any> {
+export async function getFormsByUserId(userId : string): Promise<any> {
 
     try {
         
-        //const { role } = await getRole(userId);
         const user = await getUserDetails(userId)
+        
         if (!user) {
             return { success: false, message: 'User role was not found!' };
         }
-        
-        const pdfFiles = validatePDFResult(await getAllPDF());        
-        //const activeForms = await getUserActiveForms(userId, role, pdfFiles);
 
+        // Get permited PDF forms
+        const { forms, id } = await getCompanyInfo(user.id);    
+        const formsNames = forms.map((item: any) => {
+            return item.name;
+        })
+        
+        // Dev
+        //const pdfFiles = await getAllPDF();
+        const pdfFiles = await getPDFs(formsNames);        
+        
         const activeForms = await getUserActiveForms(user)
         
         return { pdfFiles, activeForms};
@@ -38,7 +45,7 @@ export async function formSubmit(payload: FormPayload): Promise<{ success?: bool
         if (!payload?.form) {
             return { message: "Missing form data", error: "Invalid input" };
         }
-                
+        
         if (payload.sendMail) {            
             return await sendForm(payload);                 
         } else {
@@ -60,17 +67,15 @@ export async function searchForms(query: SearchData): Promise<{ message?: string
         }
           
         const queryFields = getQueryFields(query);
-                
+        
         if (query.name) {            
             queryFields.name = getEnglishFormName(query.name);           
         } else {
             queryFields.name = 'inspection';
         }          
-        
-        const records = await getSearchForms(queryFields);
 
-        const pdfFiles = validatePDFResult(await getAllPDF());
-        const foundForms =  fieldsToForm(records, findPdfFile(pdfFiles, queryFields.name))
+        const records = await getSearchForms(queryFields);        
+        const foundForms =  fieldsToForm(records)
 
         return { data: foundForms };
     } catch (error) {

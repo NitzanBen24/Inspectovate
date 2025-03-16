@@ -122,7 +122,7 @@ const _addImagesToDoc = async (pdf: PDFLibDocument, lastPage: PDFPage, images: P
             });
         }
     } catch(error) {
-        console.log('Error, could not add images to pdf:',error);                
+        console.error('Error, could not add images to pdf:',error);                
     }
 }
 
@@ -223,15 +223,17 @@ export const getAllPDF = async (): Promise<PdfForm[] | { error: unknown }> => {
                 const pdfDoc = await _loafPDF(filePath);              
                 const pdfForm = pdfDoc.getForm();  
                 
-                if (pdfForm) {                 
-                  form.formFields = pdfForm.getFields().map((field) => {                   
+                if (pdfForm) {             
+                  form.formFields = pdfForm.getFields().map((field) => {      
+                    
                     const fieldName = field.getName();
-                    const isDropDown = fieldName.endsWith('-ls');
-  
+                    //const isDropDown = fieldName.endsWith('-ls');
+                    //PDFButton
+                    const fieldType = (fieldName.endsWith('-ls')) ? 'DropDown' : field.constructor.name;                    
                     return ({
                       name: fieldName,
-                      type: isDropDown ? 'DropDown' : 'TextField',
-                      require: field.isRequired(),
+                      type: fieldType,//isDropDown ? 'DropDown' : 'TextField',
+                      require: (fieldType === 'PDFButton') ? true : field.isRequired(),
                     })
                   });
                 }
@@ -257,54 +259,61 @@ export const getAllPDF = async (): Promise<PdfForm[] | { error: unknown }> => {
     }
 };
 
-export const getPDFs = async (fileNames: string[]): Promise<PdfForm[]> => {
+export const getPDFs = async (fileNames: string[]): Promise<PdfForm[]| { error: unknown }> => {
     const forms: PdfForm[] = []; 
   
-    const pdfFolder = path.resolve('./public/templates');
-  
-    // Get all PDF files asynchronously
-    const pdfFiles = (await fs.promises.readdir(pdfFolder)).filter(file => file.endsWith('.pdf'));      
-    /** 
-     * Consider to change file to fileName
-    */
-    for (const file of pdfFiles) {
-        const filePath = path.join(pdfFolder, file);
-        const form: PdfForm = { name: file.replace('.pdf', ''), formFields: [], status: 'new' }; // Initialize form                    
-                            
-        if (fileNames.includes(form.name)) {              
-          try {
-              // Load and parse PDF document                                                    
-              const pdfDoc = await _loafPDF(filePath);
-              const pdfForm = pdfDoc.getForm();                  
-              
-              if (pdfForm) {                 
-                form.formFields = pdfForm.getFields().map((field) => {                   
-                  const fieldName = field.getName();
-                  const isDropDown = fieldName.endsWith('-ls');
-  
-                  return ({
-                    name: fieldName,//isDropDown ? fieldName.replace('-ls','') :
-                    type: isDropDown ? 'DropDown' : 'TextField',
-                    require: field.isRequired(),
-                  })
-                });
-              }
-              
-              // Add needed fields that not in the pdf file
-              form.formFields.push(..._addFormFields(form.name));
-              
-              // Only push forms with fields
-              if (form.formFields.length > 0) {
-                forms.push(form);
-              }
-              
-          } catch (error) {
-              console.error(`Error processing file ${file}:`, error);                   
-          }                    
+    try {
+        const pdfFolder = path.resolve('./public/templates');
+        // Get all PDF files asynchronously
+        const pdfFiles = (await fs.promises.readdir(pdfFolder)).filter(file => file.endsWith('.pdf'));      
+        /** 
+         * Consider to change file to fileName
+        */
+        for (const file of pdfFiles) {
+            const filePath = path.join(pdfFolder, file);
+            const form: PdfForm = { name: file.replace('.pdf', ''), formFields: [], status: 'new' }; // Initialize form                    
+                                
+            if (fileNames.includes(form.name)) {   
+    
+                try {
+                    // Load and parse PDF document                                                    
+                    const pdfDoc = await _loafPDF(filePath);
+                    const pdfForm = pdfDoc.getForm();                  
+                    
+                    if (pdfForm) {
+                        form.formFields = pdfForm.getFields().map((field) => {                   
+                        const fieldName = field.getName();
+                        const isDropDown = fieldName.endsWith('-ls');
+        
+                        return ({
+                            name: fieldName,
+                            type: isDropDown ? 'DropDown' : 'TextField',
+                            require: field.isRequired(),
+                        })
+                        });
+                    }
+                    
+                    // Add needed fields that not in the pdf file
+                    form.formFields.push(..._addFormFields(form.name));
+                    
+                    // Only push forms with fields
+                    if (form.formFields.length > 0) {
+                        forms.push(form);
+                    }
+                    
+                } catch (error) {
+                    console.error(`Error processing file ${file}:`, error);                   
+                }                    
+            }
         }
+      
+        return forms;
+    } catch (pdfError) {
+        console.error('Error generating PDF:', pdfError);
+        return { error: pdfError };     
     }
-  
-    return forms;
+
+    
 };
 
 // Add user data to pdf file
@@ -355,6 +364,19 @@ export const preparePdf = async (pdfFormData: PdfForm): Promise<Uint8Array | { e
               await _addImagesToDoc(pdfDoc,lastPage, embedImages)
           }        
       }
+        
+        /** todo: add signature to file, handle design */
+        if (pdfFormData.signature) {
+            const [ lastPage ]: PDFPage[] =  await pdfDoc.copyPages(pdfDoc, [pageCount - 1]);
+            const sigIamge = await pdfDoc.embedPng(pdfFormData.signature);
+            lastPage.drawImage(sigIamge, {
+                x: 100,
+                y: 150,
+                width: 200,
+                height: 100,
+            })
+            pdfDoc.addPage(lastPage);
+        }
       
       //Make file read only
       //form.flatten();

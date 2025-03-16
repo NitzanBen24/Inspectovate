@@ -1,6 +1,5 @@
 import { FieldsObject, FormField, FormPayload, PdfForm } from "@/app/utils/types/formTypes";
 import { addNewForm, getActiveForms, getActiveFormsByUserId, getFormById, updateForm } from "../lib/db/forms";
-import { formToFields, sanitizeFields } from "../lib/formatData";
 import { ActionResponse } from "@/app/utils/types/apiTypes";
 import { appStrings } from "@/app/utils/AppContent";
 import { EmailInfo } from "@/app/utils/types/emailTypes";
@@ -8,6 +7,7 @@ import { getPDFs, preparePdf } from "./pdfService";
 import { downloadImages } from "./storageService";
 import { prepareEmail, sendEmail } from "./emailService";
 import { User } from "@/app/utils/types/entities";
+import { sanitizeFields } from "../lib/formatData";
 
 /**
  * Refactor: this use is for tcelcric, might not needed for new customers
@@ -63,31 +63,8 @@ function _addStorageForm(inspection: PdfForm, storage: PdfForm) {
     return updatedSmallArray;
 }
 
-// function _getExcludedFields(formName: string): string[] {
-//     if (formName === "inspection") {
-//         return ["ephone", "eemail", "elicense", "pphone", "pemail", "plicense"];
-//     }
-//     return [];
-// }
-
-// const _dataToFields = (data: FormPayload) => {    
-//     const excludedFields = _getExcludedFields(data.form.name);
-//     // Prepare data to DB
-//     const fields: FieldsObject = formToFields(
-//         {
-//             form: data.form,
-//             storage: data.form.images || '',
-//             userId: data.userId,
-//             userName: data.userName,
-//             status: data.form.status,
-//         },
-//         excludedFields,
-//     );
-
-//     return sanitizeFields(fields); 
-// }
-
 const _prepareFields = (payload: FormPayload): FieldsObject => {
+     /** todo: consider move to seperate file  */
     const queryFields: FieldsObject = {
         name: payload.form.name,
         fields:JSON.stringify(payload.form.formFields),
@@ -99,7 +76,7 @@ const _prepareFields = (payload: FormPayload): FieldsObject => {
         status: payload.form.status,
     }
     
-    return queryFields;
+    return sanitizeFields(queryFields);
 }
 
 async function _saveData (form: PdfForm, fields:FieldsObject) {
@@ -115,17 +92,16 @@ async function _saveData (form: PdfForm, fields:FieldsObject) {
     }
 }
 
-/** todo: Refactor => theres a lot of await, await in await | await in a map loop */
 async function _prepareToSend (data: any): Promise<EmailInfo> {
-
     const pdfForms : PdfForm[] = [data.form];     
     //check for storage form
     if (data.hasStorageForm.current) {                
-        const storageForms = await getPDFs(['storage']);                   
-        storageForms[0].formFields = _addStorageForm(data.form, storageForms[0]);                                                        
-        pdfForms.push(storageForms[0]);          
+        const storageForms = await getPDFs(['storage']);  
+        if (!('error' in storageForms)) {
+            storageForms[0].formFields = _addStorageForm(data.form, storageForms[0]);                                                        
+            pdfForms.push(storageForms[0]);          
+        }        
     }           
-
     // Prepare PDF documents concurrently
     const pdfDocs = await Promise.all(pdfForms.map((form) => preparePdf(form)));    
     const email = prepareEmail(pdfForms[0].formFields, data.role, pdfForms[0].name);
@@ -133,16 +109,9 @@ async function _prepareToSend (data: any): Promise<EmailInfo> {
     
     return email;
 }
-
-export const getUserActiveForms = async (user: User): Promise<PdfForm[]> => {
-
-    const activeFormsRecords = (user.role === 'admin') ? await getActiveForms() : await getActiveFormsByUserId(user.id.toString());
-
-    return activeFormsRecords.map((record) => {
-        // const formFields = JSON.parse(record.fields).map((field: FormField) => { 
-        //     field.name.endsWith('-ls');
-        // });
-        console.log('check!!',JSON.parse(record.fields))
+/** consider a change function name */
+export const fieldsToForm = (fields: any[]) => {
+    return fields.map((record) => {        
         return {
             id: record.id,
             name: record.name,
@@ -158,12 +127,16 @@ export const getUserActiveForms = async (user: User): Promise<PdfForm[]> => {
     });
 }
 
+export const getUserActiveForms = async (user: User): Promise<PdfForm[]> => {
+    const records = (user.role === 'admin') ? await getActiveForms() : await getActiveFormsByUserId(user.id);
+    return fieldsToForm(records);
+}
+
 export const saveForm = async (payload: FormPayload): Promise<ActionResponse> => {
 
     try {
     
         const fields = _prepareFields(payload)
-        console.log('fields!!', fields)
         // DB actions
         const dbResult = await _saveData(payload.form, fields);    
                         
@@ -183,7 +156,7 @@ export const saveForm = async (payload: FormPayload): Promise<ActionResponse> =>
 export const sendForm = async (payload: FormPayload) => {
 
     try {        
-        
+
         if (payload.form.images) {            
             payload.form.images = await downloadImages(payload.form.images);            
         }

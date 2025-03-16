@@ -11,6 +11,9 @@ export const sysStrings = {
   },
   database: {
     saveFailed: 'Saving data failed!',
+  },
+  storage: {
+    uploadFailed: '!העלאת תמונות נכשלה'
   }
 }
 
@@ -44,7 +47,8 @@ export const formFieldMap = {
     elevator: ['elevator', 'mainbreaker', 'mainbreakersize'],
     //charge
     charge: ['station', 'manufacture', 'model', 'power',  'maxcurrent', 'breakersize'],
-    end: ['comments', 'message']
+    end: ['comments', 'message'],
+    signature: ['signature']
 }
 
 // FormFeilds

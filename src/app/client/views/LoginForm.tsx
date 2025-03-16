@@ -95,7 +95,7 @@ const LoginForm = () => {
     </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} >
-        <h2>This is a modal!</h2>
+        {/* <h2>This is a modal!</h2> */}
         <p>{ message }</p>
       </Modal>
 

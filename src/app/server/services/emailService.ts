@@ -30,12 +30,14 @@ export const prepareEmail = (fields: FormField[], role: string, formName: string
     }
   });
 
-  // Alpha version => Testing  
-  options.reciver = (role === 'admin' || formName === 'inspection') ? 'hazanreport@gmail.com' : 'tcelctric@gmail.com';
-  const reciverField = fields.find((item) => item.name === 'reciver');
-  if (reciverField) {    
-    options.reciver = 'nitzanben24@gmail.com';
-  }
+  // // Alpha version => Testing  
+  // options.reciver = (role === 'admin' || formName === 'inspection') ? 'hazanreport@gmail.com' : 'tcelctric@gmail.com';
+  // const reciverField = fields.find((item) => item.name === 'reciver');
+  // if (reciverField) {    
+  //   options.reciver = 'nitzanben24@gmail.com';
+  // }
+
+  options.reciver = 'nitzanben24@gmail.com';
   
   // Return the final EmailInfo object 
   return options;
@@ -44,39 +46,37 @@ export const prepareEmail = (fields: FormField[], role: string, formName: string
 // todo: remove success is uneccessary => you can check with error
 export async function sendEmail({ email }: MailOptions): Promise<ActionResponse> {
   
-  if (!email.reciver || !email.customer || !email.attachments) {
-    const error = sysStrings.email.failedMessage + sysStrings.email.missingInfo;
-    console.error(error);
-    return { success: false, message: error, error };
-  }
+    if (!email.reciver || !email.customer || !email.attachments) {
+        const error = sysStrings.email.failedMessage + sysStrings.email.missingInfo;
+        console.error(error);
+        return { success: false, message: error, error };
+    }
 
-  const attachments = email.attachments.map((item, index) => ({
-    filename: `${email.customer}${(index === 0) ? '' : index}.pdf`,
-    content: item,
-    encoding: 'base64',
-  }));
+    const attachments = email.attachments.map((item, index) => ({
+        filename: `${email.customer}${(index === 0) ? '' : index}.pdf`,
+        content: item,
+        encoding: 'base64',
+    }));
 
-  const options = {
-    from: process.env.EMAIL_USER,
-    to: email.reciver,
-    subject: email.provider || '',
-    text: email.message || '',
-    attachments,
-  };
+    const options = {
+        from: process.env.EMAIL_USER,
+        to: email.reciver,
+        subject: email.provider || '',
+        text: email.message || '',
+        attachments,
+    };
 
-  try {
+    try {
 
-    const emailResponse = await transporter.sendMail(options);        
+        await transporter.sendMail(options);        
 
-    //LOGS
-    console.info(sysStrings.email.successMessage)
+        //LOGS
+        console.info(sysStrings.email.successMessage)
 
-    return { success: true, message: appStrings.dataSaved +' '+ appStrings.email.success };
-    
-  } catch (mailError) {
-
-    console.error(sysStrings.email.failedMessage, mailError);
-    return { success: false, message: appStrings.email.failed, error: mailError };
-
-  }
+        return { success: true, message: appStrings.dataSaved +' '+ appStrings.email.success };
+        
+    } catch (mailError) {
+        console.error(sysStrings.email.failedMessage, mailError);
+        return { success: false, message: appStrings.email.failed, error: mailError };
+    }
 }

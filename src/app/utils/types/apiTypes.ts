@@ -22,3 +22,10 @@ export interface ActionResponse {
     error?: unknown;
 }
 
+export interface apiPayload {
+    message: string;
+    success?: boolean;
+    error?: unknown;
+    data?: any;
+}
+

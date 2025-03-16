@@ -39,10 +39,10 @@ const FormsDashboard = () => {
         'formRecords', 
         `forms/${user.id}`,
         {            
-            refetchOnMount: true,
+            refetchOnMount: false,
             refetchOnWindowFocus: true,
-            // staleTime: 5 * 60 * 1000, 
-            // cacheTime: 15 * 60 * 1000,
+            staleTime: 5 * 60 * 1000, 
+            cacheTime: 15 * 60 * 1000,
         }
     )
     //console.log('Dashboard.forms=>data',data)
@@ -73,7 +73,7 @@ const FormsDashboard = () => {
     if (isLoading) return <Spinner />
     if (isError) return <div>Error loading data.</div>;    
     
-    //console.log('Home.render=>forms',forms)
+    //console.log('DaschBoard.forms=>',forms)
     
     return (    
 

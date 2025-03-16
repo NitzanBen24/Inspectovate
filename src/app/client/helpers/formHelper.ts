@@ -66,10 +66,10 @@ export const addInspectionFields = (formFields: FormField[], formRef: React.Muta
 
 // Create blocks with a key to render 
 export const generateFormBlocks = (formFields: FormField[]) => {
-    return Object.entries(formFieldMap).map(([key, value]) => {
+    return Object.entries(formFieldMap).map(([key, value]) => {        
         return {            
             name: key,
-            fields: formFields.filter((field: any) => value.includes(field.name) && field.require)
+            fields: formFields.filter((field: any) => (value.includes(field.name) && field.require))
         };
     });
 };

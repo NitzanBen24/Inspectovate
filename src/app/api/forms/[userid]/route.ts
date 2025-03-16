@@ -1,5 +1,5 @@
 
-import { getFormsDataByUserId } from '@/app/server/actions/formActions';
+import { getFormsByUserId } from '@/app/server/actions/formActions';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET (req: NextRequest, { params }: { params: { userid: string } }): Promise<NextResponse> {
@@ -7,7 +7,7 @@ export async function GET (req: NextRequest, { params }: { params: { userid: str
     
     try {
 
-      const data = await getFormsDataByUserId(userid);     
+      const data = await getFormsByUserId(userid);     
     
       return NextResponse.json(data);
 

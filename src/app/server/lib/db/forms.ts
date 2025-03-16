@@ -25,12 +25,12 @@ export const getActiveForms = async (): Promise<FieldsObject[]> => {
     return data;
 };
 
-export const getActiveFormsByUserId = async (id: string): Promise<FieldsObject[]> => {
+export const getActiveFormsByUserId = async (id: number): Promise<any[]> => {
     
     const { data, error } = await supabase
     .from('forms_records')
     .select('*')
-    .eq('userid', id)
+    .eq('user_id', id)
     .neq('status', 'archive')
     .order("created_at", { ascending: false }); // Ensure latest data
 
@@ -42,23 +42,23 @@ export const getActiveFormsByUserId = async (id: string): Promise<FieldsObject[]
 }
 
 export const getFormById = async (id: string): Promise<FieldsObject> => {
-
-  const parsedId = parseInt(id, 10);
-  if (isNaN(parsedId)) {
-    throw new Error('Error: Invalid ID provided. ID must be a number.');
-  }
   
-  const { data, error } = await supabase
-    .from('forms_records')
-    .select('*')
-    .eq('id', parsedId)
-    .single();
+    const parsedId = parseInt(id, 10);
+    if (isNaN(parsedId)) {
+      throw new Error('Error: Invalid ID provided. ID must be a number.');
+    }
+    
+    const { data, error } = await supabase
+      .from('forms_records')
+      .select('*')
+      .eq('id', parsedId)
+      .single();
 
-  if (error) {
-    throw new Error(`Error fetching form from table forms_records: ${error.message}`);
-  }
+    if (error) {
+      throw new Error(`Error fetching form from table forms_records: ${error.message}`);
+    }
 
-  return data as FieldsObject;
+    return data as FieldsObject;
    
 };
 

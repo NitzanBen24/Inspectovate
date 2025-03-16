@@ -17,6 +17,7 @@ export interface PdfForm {
     images?: any;
     company_id?:number;
     company_name?: string;
+    signature?: any;
 }
 
 export type FieldsObject = {
@@ -34,6 +35,7 @@ export interface FormPayload {
     hasStorage: boolean;
     action?: string
     files?: any[];
+    signature?: any;
 }
 
 export interface ListOption {

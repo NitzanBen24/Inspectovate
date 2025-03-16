@@ -55,12 +55,16 @@ export const useMultiFetch = <T extends unknown[]>(queries: QueryConfig<T[number
 // Function to handle POST requests (send data)
 const postData = async <T, R>(path: string, payload: T): Promise<R> => {
     
-    const { data } = await axios.post(`/api/${path}`, payload, {
-        headers: {
-          Authorization: `Bearer ${_apiKey}`,  // Add API key to headers
-        },
-      });
-    return data;
+    try {
+        const { data } = await axios.post(`/api/${path}`, payload, {
+            headers: {
+              Authorization: `Bearer ${_apiKey}`,  // Add API key to headers
+            },
+          });
+        return data;
+    } catch(error: any) {
+        throw new Error(error.response?.data?.message || 'Failed to post data');
+    }    
 };
 
 export const usePost = <T, R = any>(
@@ -160,7 +164,7 @@ export const useDelete = <T,R = any>(
 };
 
 
-const uploadImages = async <R>(path: string, payload: UploadPayload): Promise<R> => {
+const uploadData = async <R>(path: string, payload: UploadPayload): Promise<R> => {
     const formData = new FormData();
     // Append each file to the FormData
     payload.images?.forEach((img, index) => {            
@@ -182,7 +186,8 @@ const uploadImages = async <R>(path: string, payload: UploadPayload): Promise<R>
       
       return data; // Assuming the response returns an array of image URLs
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Image upload failed');
+        /** todo: check error structure */
+        throw new Error(error.response?.data?.message || 'Image upload failed');
     }
 };
   
@@ -196,7 +201,7 @@ export const useImageUpload = < R = any>(
     const queryClient = useQueryClient();
   
     return useMutation<R, AxiosError, UploadPayload>({
-      mutationFn: (payload) => uploadImages<R>(path, payload),
+      mutationFn: (payload) => uploadData<R>(path, payload),
       onSuccess: (data) => {
         // Invalidate any queries associated with the mutationKey
         queryClient.invalidateQueries({
@@ -208,6 +213,7 @@ export const useImageUpload = < R = any>(
       },
       onError: (error) => {
         // Call onError callback if there is an error
+        console.log('onError!!',error)
         onError?.(error);
       },
     });

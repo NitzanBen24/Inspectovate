@@ -24,7 +24,7 @@ interface Props {
 }
 
 const FormsList = ({ forms, openForm, title, addFilter, display }: Props) => {
-  console.log('FormList=>',forms)
+  
   const [ show, setShow ] = useState<boolean>(display);
   const [ isModalOpen, setIsModalOpen ] = useState<boolean>(false);
   const [ message, setMessage ] = useState<string>('');
@@ -100,7 +100,7 @@ const FormsList = ({ forms, openForm, title, addFilter, display }: Props) => {
   const toggleList = () => {
     setShow(!show)
   }
-  console.log('FormList=>length',forms.length)
+  //console.log('FormList=>',forms)
   return (
       <>
       {forms.length > 0 && <div className='form-list border-gray-400 border-bottom py-2 px-4'>
@@ -153,7 +153,7 @@ const FormsList = ({ forms, openForm, title, addFilter, display }: Props) => {
       </div>}
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
-            <h2>This is a modal!</h2>
+            {/* <h2>This is a modal!</h2> */}
             <p>{message}</p>
         </Modal>
       </>

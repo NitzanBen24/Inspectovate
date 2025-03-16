@@ -13,10 +13,13 @@ import { addInspectionFields, calcPower, formatHebrewDate, generateFormBlocks, i
 import SearchableDropdown, { SearchableDropdownHandle } from './SearchableDropdown';
 import { useImageUpload, usePost } from '../../hooks/useQuery';
 import { appStrings, facillties, fieldsNameMap } from '@/app/utils/AppContent';
-import { getHebrewFormName } from '@/app/utils/helper';
+import { dataURLtoBlob, getHebrewFormName, getHebrewString } from '@/app/utils/helper';
 import { Spinner } from '../ui/Spinner';
 import Modal from '../ui/Modal';
 import AttachFile from '../AttachFile';
+import SignaturePad  from '../SignaturePad'
+import ChevronDownIcon from '@heroicons/react/16/solid/ChevronDownIcon';
+import { Button } from 'react-bootstrap';
 
 
 
@@ -26,7 +29,7 @@ interface Props {
 }
 
 const Form = ({ form, close }: Props) => {
-    //console.log('Form.render=>')
+    
     const { user } = useUser();
     const { technicians } = useTechnician();
     const { manufactures } = useManufacture();
@@ -38,6 +41,9 @@ const Form = ({ form, close }: Props) => {
     const [ provider, setProvider ] = useState<string | boolean>(false);     
     const [ message, setMessage ] = useState<string>('');
     const [ isLoading, setLoading ] = useState<boolean>(false);
+    const [ signature, setSignature ] = useState<string | null>(null);
+    const [ showSignature, setShowSignature ] = useState(false);
+
     
     const sendMail = useRef(false);
     const hasStorageForm = useRef<boolean>(false);
@@ -76,9 +82,9 @@ const Form = ({ form, close }: Props) => {
 
         if (isProvider) setProvider(isProvider);        
         
-    }, [form.formFields])    
+    }, [form.formFields])
 
-    console.log('tech->',technicians)
+    //console.log('Form.render=>',form)
 
     const handleSubmitSuccess = (res: any) => {            
         if (form.status === 'sent') {
@@ -107,13 +113,18 @@ const Form = ({ form, close }: Props) => {
 
     // todo: Handle error
     const handleUploadError = (error: any) => {
+        /** todo: check error structure, maybe we can setMessage with error instead of error.message */
+        //console.log('error=>',error)
         console.error('Error uploading images: ', error);
+        setLoading(false);
+        setMessage(error.message);
+        openModal();
     }
     const handleUploadSuccess = (res: any) => {             
         attachImagesSorce(res);
         submitForm(form);
     }
-    const { mutate: uploadImages } = useImageUpload(
+    const { mutate: imageUploader } = useImageUpload(
         'upload', 
         'images', 
         handleUploadSuccess,
@@ -178,6 +189,7 @@ const Form = ({ form, close }: Props) => {
         }
     }
 
+    /** todo: change function name */
     const prepareToSend = () => { 
 
         if (form.name === 'inspection') {
@@ -216,7 +228,7 @@ const Form = ({ form, close }: Props) => {
         
     }
     
-    const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {            
+    const handleFormSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {            
         
         if (!event.currentTarget.id) {
             console.error('Error can not submit Form!!')
@@ -233,7 +245,7 @@ const Form = ({ form, close }: Props) => {
         fillFormFields();
     
         if (images.length > 0) {            
-            uploadImages({
+            imageUploader({
                 images: images as File[],                
                 userId: user?.id
             });
@@ -259,7 +271,8 @@ const Form = ({ form, close }: Props) => {
         }
     }
 
-    const submitForm = (submissionForm: PdfForm) => {        
+    const submitForm = (submissionForm: PdfForm) => {
+        // console.log('submitForm.submissionForm=>',submissionForm)
         formSubmit({
             userId: submissionForm.userId || user.id, 
             userName: submissionForm.userName || user.name,
@@ -269,7 +282,7 @@ const Form = ({ form, close }: Props) => {
             company_name: submissionForm.company_name || user.company_name,
             sendMail: sendMail.current, 
             hasStorageForm,
-            action: 'submit',
+            action: 'submit'
         });
         
     }
@@ -362,6 +375,7 @@ const Form = ({ form, close }: Props) => {
         const listOptions = field.type === 'DropDown' ? getListOptions(field.name.replace("-ls", "")) : [];
         
         const renderField = () => {
+            //console.log('field.type=>',field.type)
             if (field.type === 'DropDown') {
                 return (
                     <SearchableDropdown ref={registerRef} options={listOptions} fieldName={field.name}  text="חפש" value={field.value || ''} onValueChange={handleListChange} />                
@@ -371,6 +385,24 @@ const Form = ({ form, close }: Props) => {
                 return (
                     <textarea className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" key={field.name} name={field.name} rows={3} disabled={isPending} required/>
                 );
+            }
+            if (field.type === "PDFButton") {
+                //console.log('PDFButton=>')
+                // return (
+                //     <>
+                //     {   
+                //         <div onClick={() => setShowSignature(!showSignature)} className='add-sign-tab flex justify-end'>
+                //             <span className='flex my-2'>                        
+                //                 <ChevronDownIcon className="size-6"/>
+                //                 {getHebrewString('signature')}
+                //             </span>                    
+                //         </div>
+                //     }
+                //     { showSignature && <SignaturePad onSave={setSignature}/>}
+                    
+                //     { showSignature && <button onClick={saveSignature}>sign</button>}
+                //     </>
+                //)
             }
             return (
                 <input className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" type="text" key={field.name} name={field.name} disabled={isPending} required />
@@ -396,7 +428,7 @@ const Form = ({ form, close }: Props) => {
             </div>
         );
     };
-    
+    //console.log('formBlocks=L',formBlocks)
     // Memoize the rendering of blocks
     const renderBlocks = useMemo(() => {        
         return formBlocks.map((block, index) => {
@@ -431,14 +463,25 @@ const Form = ({ form, close }: Props) => {
     const closeModal = () => setIsModalOpen(false);
 
     // AttachFile methods
-    const updateImages = (files: File[]) => {   
-        setImages(files)
-    }
+    const updateImages = useCallback((files: File[]) => {   
+        setImages(files);
+    }, []);
 
     const clearAttchedFiles = () => {
         attachmentsRef.current?.clear();
         delete form.images;
         setImages([]);
+    }
+
+    const saveSignature = () => {
+        
+        //console.log('saveSignature.type=>',typeof signature)
+        if (signature) {
+            // console.log('dataURLtoBlob=>',dataURLtoBlob(signature))
+            // console.log('saveSignature.type=>',typeof dataURLtoBlob(signature))
+            form.signature = signature;
+        }
+        
     }
 
     return (
@@ -468,13 +511,25 @@ const Form = ({ form, close }: Props) => {
 
             {isLoading && <Spinner />}
 
-            <button id='BtnSend' className='w-full border-2 border-black text-blck px-4 mt-3 py-2 rounded-lg' type="button" onClick={handleClick} disabled={isPending}>
+            <button id='BtnSend' className='w-full border-2 border-black text-blck px-4 mt-3 py-2 rounded-lg' type="button" onClick={handleFormSubmit} disabled={isPending}>
                 שלח
             </button>
-            <button id='BtnSave' className='w-full border-2 border-black text-blck px-4 mt-3 py-2 rounded-lg' type="button" onClick={handleClick} disabled={isPending}>
+            <button id='BtnSave' className='w-full border-2 border-black text-blck px-4 mt-3 py-2 rounded-lg' type="button" onClick={handleFormSubmit} disabled={isPending}>
                 שמור
             </button>
+
+            {/* {   
+                <div onClick={() => setShowSignature(!showSignature)} className='add-sign-tab flex justify-end'>
+                    <span className='flex my-2'>                        
+                        <ChevronDownIcon className="size-6"/>
+                        {getHebrewString('signature')}
+                    </span>                    
+                </div>
+            }
+            { showSignature && <SignaturePad onSave={setSignature}/>}
             
+            { showSignature && <button onClick={saveSignature}>sign</button>} */}
+
             {form.images ? <div className='py-2 text-right text-green-500'>{appStrings.attchmentsExists}</div>  : <AttachFile ref={attachmentsRef} updateFiles={updateImages}/>}                    
             
             {/* Alpha version => Testing */}
@@ -485,9 +540,9 @@ const Form = ({ form, close }: Props) => {
             
         </div>
 
-        
+        {/** Todo: add headline to Modal */}
         <Modal isOpen={isModalOpen} onClose={closeModal}>
-            <h2>This is a modal!</h2>
+            {/* <h2>This is a modal!</h2> */}
             <p>{message}</p>
         </Modal>
                     

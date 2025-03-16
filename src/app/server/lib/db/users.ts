@@ -53,7 +53,7 @@ export async function getUserDetails (id: string): Promise<any> {
         const { data, error } = await supabase
         .from('app_users')
         .select('*')
-        .eq('id',id)
+        .eq('id',id)//todo: check mybe beed to convert to Number
         .single()
 
         if (error) {
