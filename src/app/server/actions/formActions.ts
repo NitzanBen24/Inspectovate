@@ -21,7 +21,7 @@ export async function getFormsByUserId(userId : string): Promise<any> {
         }
 
         // Get permited PDF forms
-        const { forms } = await getCompanyInfo(user.id);            
+        const { forms } = await getCompanyInfo(user.company_id);            
         if (forms.length === 0) {
             console.warn('Warn: user missing forms')
             return { pdfFiles: [], activeForms: [] }
