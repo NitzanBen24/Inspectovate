@@ -1,5 +1,5 @@
 
-export interface FormField {
+export interface PdfField {
     name: string;
     type: string;
     require: boolean;
@@ -8,20 +8,20 @@ export interface FormField {
 
 export interface PdfForm {
     name: string;
-    formFields: FormField[];
+    formFields: PdfField[];
     status: string;
-    id?: string;
+    id?: number;
     userId?: string;
     userName?: string;
-    created?: any;
+    created_at?: any;
     images?: any;
     company_id?:number;
-    company_name?: string;
+    // company_name?: string;
     signature?: any;
 }
 
 export type FieldsObject = {
-    [key: string]: string; // Dynamic key-value pairs for each form input
+    [key: string]: string;// | PdfField[]; // Dynamic key-value pairs for each form input
 }
 
 export interface FormPayload {
@@ -30,7 +30,7 @@ export interface FormPayload {
     userName: string;
     role: string;
     company_id?: number;
-    company_name?: string;
+    //company_name?: string;
     sendMail?: boolean;
     hasStorage: boolean;
     action?: string

@@ -42,6 +42,13 @@ const SearchableDropdown = forwardRef<SearchableDropdownHandle, Props>(
       [query, normalizedOptions]
     );
 
+    // todo: check if needed
+    /**
+     * useEffect(() => {
+      setQuery(value || '');
+    }, [value]);
+     */
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const input = e.target.value;
       setQuery(input);

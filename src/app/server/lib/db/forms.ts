@@ -1,10 +1,23 @@
 import { FieldsObject } from "@/app/utils/types/formTypes";
-import { ActionResponse } from "@/app/utils/types/apiTypes";
+import { ActionResponse } from "@/app/utils/types/general";
 import { supabase } from "../supabase";
 import { SearchData } from "@/app/utils/types/payloads";
+import { formModel } from "@/app/utils/types/entities";
+import { PostgrestError } from "@supabase/supabase-js";
+import { appStrings, sysStrings } from "@/app/utils/AppContent";
 
 
-export const getActiveForms = async (): Promise<FieldsObject[]> => {
+const _setErrorMessage = (error: any) => {//, act: string
+
+
+    if (!error.message) {
+        error.message = sysStrings.database.error;
+    }
+
+    return error;
+}
+ 
+export const getActiveForms = async (): Promise<formModel[]> => {
 
     const { data, error } = await supabase
         .from('forms_records')
@@ -13,145 +26,134 @@ export const getActiveForms = async (): Promise<FieldsObject[]> => {
         .order("created_at", { ascending: false }); // Ensure latest data
 
     if (error) {
-        throw new Error(`Error fetching forms: ${error.message}`);
+        console.error(`Error fetching forms: ${error.message}`)
+        throw error;
     }
 
     // Remove 'user_id' from each form object
-    const filteredData = data.map((item: FieldsObject) => {
-        const { user_id, ...rest } = item;
-        return rest;
-    });
+    // const filteredData = data.map((item: formModel) => {
+    //     const { user_id, ...rest } = item;
+    //     return rest;
+    // });
 
     return data;
 };
 
-export const getActiveFormsByUserId = async (id: number): Promise<any[]> => {
+export const getActiveFormsByUserId = async (id: number): Promise<formModel[]> => {
     
     const { data, error } = await supabase
-    .from('forms_records')
-    .select('*')
-    .eq('user_id', id)
-    .neq('status', 'archive')
-    .order("created_at", { ascending: false }); // Ensure latest data
+        .from('forms_records')
+        .select('*')
+        .eq('user_id', id)
+        .neq('status', 'archive')
+        .order("created_at", { ascending: false }); // Ensure latest data
 
     if (error) {
-      throw new Error(`Error fetching forms for user ID "${id}" from table forms_records: ${error.message}`);
+        console.error(`Error fetching forms for user ID:: ${error.message}`);
+        throw error;
     }
     
-    return data as FieldsObject[];
+    return data;
 }
 
-export const getFormById = async (id: string): Promise<FieldsObject> => {
-  
-    const parsedId = parseInt(id, 10);
-    if (isNaN(parsedId)) {
-      throw new Error('Error: Invalid ID provided. ID must be a number.');
-    }
+export const getFormById = async (id: number): Promise<formModel[]> => {
     
     const { data, error } = await supabase
       .from('forms_records')
       .select('*')
-      .eq('id', parsedId)
-      .single();
+      .eq('id', id);
 
     if (error) {
-      throw new Error(`Error fetching form from table forms_records: ${error.message}`);
+        console.error(`Error fetching form from table forms_records:: ${error}`);      
+        throw error;
     }
 
-    return data as FieldsObject;
-   
+    return data;
 };
 
-export const addNewForm = async (payload: FieldsObject): Promise<ActionResponse> => {
+export const addNewForm = async (payload: formModel): Promise<any> => {
 
-    const { error } = await supabase.from('forms_records').insert(payload);
+    const { error, data } = await supabase.from('forms_records').insert(payload).select();
 
     if (error) {
-        console.error('Error inserting data:', error.message);
-        throw new Error(`Error, Failed to insert data: ${error.message}`);        
+        console.error('Error: failed to insert new data::', error);        
+        throw new Error(error.message || sysStrings.database.error);// _setErrorMessage(error);
     }
 
-    return { message: 'Data inserted successfully',success: true };
+    return data;
 }
 
-export const updateForm = async (id: string | number, payload: FieldsObject): Promise<ActionResponse> => {  
-  
-  const { error } = await supabase
-    .from('forms_records')
-    .update(payload)
-    .eq('id', id); // Assuming `id` is the primary key column name
+export const updateForm = async (id: string | number, payload: formModel): Promise<any> => {  
+    
+    const { error, data } = await supabase
+        .from('forms_records')
+        .update(payload)
+        .eq('id', id) // Assuming `id` is the primary key column name
+        .select();
 
-  if (error) {
-    console.error('Error updating data:', error.message);
-    throw new Error(`Error updating data: ${error.message}`)
-    //return { error, message: 'Failed to update data!' };
-  }
+    if (error) {        
+        console.error('Error: failed to update form::=>',error)        
+        throw _setErrorMessage(error);
+    }
+    
+    return data;
+};
 
-  return { message: 'Data updated successfully',success: true };
+export const updateFormStatus = async (payload: {id: string , status: string}): Promise<any> => {
+
+    const { error } = await supabase
+        .from('forms_records')
+        .update({ status: payload.status }) // Update only the status field
+        .eq("id", payload.id) // Match the record by its ID
+        .select();
+        
+    if (error) {        
+        console.error('Error: failed to update form status::',error.message)        
+        throw _setErrorMessage(error); 
+    }
+
+    return { message: appStrings.form.archive, success: true };
 
 };
 
-export const updateFormStatus = async (payload: {id: string , status: string}): Promise<ActionResponse> => {
+export const  deleteForm = async (id:string): Promise<any> => {
 
-  const { error } = await supabase
-    .from('forms_records')
-    .update({ status: payload.status }) // Update only the status field
-    .eq("id", payload.id); // Match the record by its ID
+    const { error } = await supabase
+        .from('forms_records')
+        .delete() // Delete the record
+        .eq("id", id); // Match the record by its ID
 
-  if (error) {
-    console.error("Error updating status:", error.message);
-    throw new Error(`Error updating status: ${error.message}`)    
-  }
+    if (error) {
+        console.error("Error deleting form:", error.message);
+        throw _setErrorMessage(error); 
+    }
 
-  return { message: "Status updated successfully", success: true };
-
-};
-
-export const  deleteForm = async (id:string): Promise<ActionResponse> => {
-
-  const { error } = await supabase
-  .from('forms_records')
-  .delete() // Delete the record
-  .eq("id", id); // Match the record by its ID
-
-  if (error) {
-    console.error("Error deleting form:", error.message);
-    throw new Error(`Error, Failed to delete form: ${error.message}`);
-  }
-
-  return { message: "Form deleted successfully", success: true };
+    return { message: appStrings.form.delete, success: true };
 
 }
 
 export const getSearchForms = async (searchQuery: SearchData): Promise<any> => {
-  try {
-    
+        
     let query = supabase.from('forms_records').select('*').eq('status', 'archive');
-
     // Add filters dynamically
     Object.entries(searchQuery).forEach(([key, value]) => {
-      if (key === 'created_at') {
+    if (key === 'created_at') {
         // Handle date filtering for the created_at field
         query = query.gte(key, `${value}T00:00:00`).lt(key, `${value}T23:59:59`);
-      } else {
+    } else {
         // Handle other fields
         query = query.ilike(key, `%${value}%`); // Use ilike for partial matches
-      }
+    }
     });
 
     // Execute the query
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching: getSearchForms:', error);
-      throw error; // Re-throw the error to be handled by the outer try-catch block
+        console.error('Error fetching: getSearchForms:', error);            
+        throw _setErrorMessage(error);
     }
     
     return data;
 
-  } catch (error) {
-    console.error('Error in getSearchForms:', error);
-    // Handle the error here, e.g., return a default value, throw a custom error, etc.
-    return null; 
-  }
 };

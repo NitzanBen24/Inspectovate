@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
 
         const uploadRes = await uploadToStorage(userId, images);
         
-        if (!uploadRes.success) {
-            return NextResponse.json({ error: uploadRes.error, message: uploadRes.error }, { status: 500 });
+        if (uploadRes.error) {
+            return NextResponse.json({ error: uploadRes.error, message: uploadRes.message }, { status: 500 });
         }
         
         return NextResponse.json({ folderName: uploadRes.folderName });

@@ -1,11 +1,13 @@
 import { findPdfFile, getEnglishFormName, getQueryFields, isEmptyProps, validatePDFResult } from "@/app/utils/helper";
-import { getRole, getUserDetails } from "../lib/db/users";
+import { getUserDetails } from "../lib/db/users";
 import { getAllPDF, getPDFs } from "../services/pdfService";
 import { fieldsToForm, getUserActiveForms, saveForm, sendForm } from "../services/formService";
 import { FormPayload } from "@/app/utils/types/formTypes";
 import { SearchData } from "@/app/utils/types/payloads";
 import { getSearchForms } from "../lib/db/forms";
 import { getCompanyInfo } from "../lib/db/dbObject";
+import { ActionResponse } from "@/app/utils/types/general";
+
 
 
 export async function getFormsByUserId(userId : string): Promise<any> {
@@ -14,27 +16,30 @@ export async function getFormsByUserId(userId : string): Promise<any> {
         
         const user = await getUserDetails(userId)
         
-        if (!user) {
-            return { success: false, message: 'User role was not found!' };
+        if (!user || Object.keys(user).length === 0) {
+            return { success: false, message: 'User was not found!', error: { message: "Can't find user"} };
         }
 
         // Get permited PDF forms
-        const { forms, id } = await getCompanyInfo(user.id);    
+        const { forms } = await getCompanyInfo(user.id);            
+        if (forms.length === 0) {
+            console.warn('Warn: user missing forms')
+            return { pdfFiles: [], activeForms: [] }
+        }
+        
         const formsNames = forms.map((item: any) => {
             return item.name;
         })
         
-        // Dev
-        //const pdfFiles = await getAllPDF();
         const pdfFiles = await getPDFs(formsNames);        
         
         const activeForms = await getUserActiveForms(user)
         
-        return { pdfFiles, activeForms};
+        return { pdfFiles, activeForms };
 
-    } catch (error) {
-        console.error("Error in fetching data:", error);
-        return { success: false, message: error };
+    } catch (error: any) {
+        console.error("Error in fetching data::", error.message);
+        return { success: false, message: 'Failed to fetch user data', error };
     }
 
 }
@@ -52,13 +57,15 @@ export async function formSubmit(payload: FormPayload): Promise<{ success?: bool
             return await saveForm(payload); 
         }     
 
-    } catch (error) {
-        console.error("Error in FormSubmit:", error);
-        return { success: false, message: "An unexpected error occurred", error };
+    } catch (error: any) {
+        console.error("Error: could not submit form:", error);
+        //throw error;// new Error(error.message || 'Could not submit form:');
+        return { success: false, message: error.message, error };
+        
     }
 };
 
-export async function searchForms(query: SearchData): Promise<{ message?: string; data?:any; error?: unknown }>  {
+export async function searchForms(query: SearchData): Promise<{ success?: boolean, message?: string; data?:any; error?: unknown }>  {
     
     try {
 
@@ -78,9 +85,9 @@ export async function searchForms(query: SearchData): Promise<{ message?: string
         const foundForms =  fieldsToForm(records)
 
         return { data: foundForms };
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error in search forms:", { error, query });  
-        return { message: error instanceof Error ? error.message : "An unexpected error occurred", error };
+        return { success: false, message: error.message, error };
     }
     
     

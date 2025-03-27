@@ -2,7 +2,7 @@ import { PDFDocument as PDFLibDocument, PDFPage, PDFFont, TextAlignment, PDFImag
 import fs from 'fs';
 import path from 'path';
 import fontkit from '@pdf-lib/fontkit';
-import { FormField, PdfForm } from "@/app/utils/types/formTypes";
+import { PdfField, PdfForm } from "@/app/utils/types/formTypes";
 
 
 /**
@@ -14,8 +14,11 @@ const _reverseEnglishAndNumbers = (text: string): string  => {
         return [...match].reverse().join('');
     });
 }
+const _containsDigits = (text: string) => /\d/.test(text);
+const _reverseNumbersInHebrewText = (text: string) => text.replace(/\d+/g, (match) => match.split('').reverse().join(''));
 
-function _addFormFields(fileName: string): FormField[] {
+
+function _addFormFields(fileName: string): PdfField[] {
     const moreFields = ['comments'];
     if (fileName === 'inspection') {
       moreFields.push('message', 'provider','batteries','capacity', 'bmanufacture');
@@ -37,23 +40,32 @@ const _loafPDF = async (path: string): Promise<PDFLibDocument> => {
 
 const _fillPdfFields = async (pdfForm: PDFForm, pdfFormData: PdfForm, font: PDFFont) => {
     pdfForm.getFields().forEach((field) => {
-      
-        let formField = pdfFormData.formFields.find((item: FormField) => item.name === field.getName());      
-        let fieldText = formField?.value || pdfForm.getTextField(field.getName()).getText() || '';      
-  
-        /**
-         * todo: check why i use TextAlignment.Right, with that check also reveseEnglishNumbers
-         */
-        pdfForm.getTextField(field.getName()).setText(fieldText);
-        if (_containsHebrew(fieldText)) {         
-          pdfForm.getTextField(field.getName()).setAlignment(TextAlignment.Right);
-          pdfForm.getTextField(field.getName()).updateAppearances(font);
-        } else {
-          pdfForm.getTextField(field.getName()).setAlignment(TextAlignment.Right);
-        }
+        const fieldName = field.getName();
+        const textField = pdfForm.getTextField(fieldName);
         
-      });
-}
+        if (!textField) return; // Ensure field exists before setting values
+
+        let formField = pdfFormData.formFields.find((item: PdfField) => item.name === fieldName);
+        
+        let fieldText = formField?.value || textField.getText() || '';
+
+        const hasHebrew = _containsHebrew(fieldText);
+        const hasDigits = _containsDigits(fieldText);
+
+        if (hasHebrew && hasDigits) {
+            fieldText = _reverseNumbersInHebrewText(fieldText);
+        }
+
+        textField.setText(fieldText);
+
+        if (hasHebrew) {
+            textField.setAlignment(TextAlignment.Right);
+            textField.updateAppearances(font);
+        } else {
+            textField.setAlignment(TextAlignment.Left);
+        }
+    });
+};
 
 const _embedToPngOrJpg = async (pdf: PDFLibDocument, images: any[]): Promise<PDFImage[]> => {
     
@@ -126,8 +138,8 @@ const _addImagesToDoc = async (pdf: PDFLibDocument, lastPage: PDFPage, images: P
     }
 }
 
-const _markInspectionResult = (pdfForm: PDFForm, pdfDoc: PDFLibDocument, fields: FormField[], bold: PDFFont) => {
-    let statusField = fields.find((item: FormField) => item.name === 'status');
+const _markInspectionResult = (pdfForm: PDFForm, pdfDoc: PDFLibDocument, fields: PdfField[], bold: PDFFont) => {
+    let statusField = fields.find((item: PdfField) => item.name === 'status');
     if (statusField?.value) {      
         if (statusField.value == 'complete') {
             pdfForm.getTextField('approve').updateAppearances(bold);
@@ -140,8 +152,8 @@ const _markInspectionResult = (pdfForm: PDFForm, pdfDoc: PDFLibDocument, fields:
     }
 }
 
-function _addComments(doc: PDFLibDocument, fields: FormField[], hebrewFont: PDFFont) {
-    const comments = fields.find((item: FormField) => item.name === 'comments');    
+function _addComments(doc: PDFLibDocument, fields: PdfField[], hebrewFont: PDFFont) {
+    const comments = fields.find((item: PdfField) => item.name === 'comments');    
   
     if (comments && comments.value) {
   
@@ -309,7 +321,7 @@ export const getPDFs = async (fileNames: string[]): Promise<PdfForm[]| { error: 
       
         return forms;
     } catch (pdfError) {
-        console.error('Error generating PDF:', pdfError);
+        console.error('Error generating PDFs:', pdfError);
         return { error: pdfError };     
     }
 
@@ -317,7 +329,7 @@ export const getPDFs = async (fileNames: string[]): Promise<PdfForm[]| { error: 
 };
 
 // Add user data to pdf file
-export const preparePdf = async (pdfFormData: PdfForm): Promise<Uint8Array | { error: unknown }> => {
+export const preparePdf = async (pdfFormData: PdfForm): Promise<Uint8Array | { error: any }> => {
 
     try {
       // Load the original PDF with pdf-lib
@@ -385,8 +397,8 @@ export const preparePdf = async (pdfFormData: PdfForm): Promise<Uint8Array | { e
       const pdfBytes = await pdfDoc.save();
       return pdfBytes;
   
-    } catch (pdfError) {
-      console.error('Error generating PDF:', pdfError);
-      return { error: pdfError };     
+    } catch (pdfError: any) {
+      console.error('Error generating PDF:', pdfError.message);
+      return { error: pdfError.message };     
     }
   };

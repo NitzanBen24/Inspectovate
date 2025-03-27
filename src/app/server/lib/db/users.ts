@@ -1,17 +1,6 @@
 import { User } from "@/app/utils/types/entities";
 import { supabase } from "../supabase";
 
-// export async function getAllUsers (): Promise<User[]> {
-//     const { data, error } = await supabase
-//     .from('Users')
-//     .select('*');
-
-//     if (error) {
-//         throw new Error(`Error fetching forms: ${error.message}`);
-//     }
-    
-//     return data;
-// }
 
 export async function getUserByEmail (email : string): Promise<any> {
 
@@ -22,48 +11,43 @@ export async function getUserByEmail (email : string): Promise<any> {
     .single()
 
     if (error) {
-        throw new Error(`Error fetching forms: ${error.message}`);
+        console.error('Error getting user by email::')
+        throw error;
     }
     
     return data;
 }
 
 export async function getRole (id: string): Promise<any> {
-    try {
-        const { data, error } = await supabase
-        .from('app_users')
-        .select('role')
-        .eq('id',id)
-        .single()
+    
+    const { data, error } = await supabase
+    .from('app_users')
+    .select('role')
+    .eq('id',id)
+    .single()
 
-        if (error) {
-            console.error('Error getting user role:', error.message);            
-            throw new Error(`Failed to get user role: ${error.message}`);
-        }
-        
-        return data;
-    } catch (err) {
-        console.error('Unexpected error getting user role:', err);
-        return { error: err, message: 'Can not get user role An unexpected error occurred!' };
+    if (error) {
+        console.error('Error getting user role::', error.message);            
+        throw error;
     }
+    
+    return data;
+    
 }
 
 export async function getUserDetails (id: string): Promise<any> {
-    try {
-        const { data, error } = await supabase
+
+    const { data, error } = await supabase
         .from('app_users')
         .select('*')
-        .eq('id',id)//todo: check mybe beed to convert to Number
+        .eq('id',id)
         .single()
 
-        if (error) {
-            console.error('Error getting user role:', error.message);            
-            throw new Error(`Failed to get user role: ${error.message}`);
-        }
-        
-        return data;
-    } catch (err) {
-        console.error('Unexpected error getting user role:', err);
-        return { error: err, message: 'Can not get user role An unexpected error occurred!' };
+    
+    if (error) {
+        console.error('Error getting user details::', error.message);            
+        throw error;
     }
+    
+    return data;
 }

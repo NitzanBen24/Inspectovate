@@ -17,8 +17,8 @@ export const GET = async (req: NextRequest, { params }: { params: { type: string
       }
       
       return NextResponse.json(response);
-    } catch (error) {
-      console.error('Error loading PDF template:', error);
+    } catch (error: any) {
+      console.error('Error fetching data, get-data:', error.message);
       return NextResponse.json({ error: 'Failed to load PDF template' }, { status: 500 });
     }
   } 

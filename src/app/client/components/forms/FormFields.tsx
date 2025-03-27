@@ -1,0 +1,110 @@
+'use client';
+import { formFieldMap } from '@/app/utils/AppContent';
+import { FieldsObject, PdfField, PdfForm } from '@/app/utils/types/formTypes'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Field from './Field';
+import { SearchableDropdownHandle } from './SearchableDropdown';
+import { useTechnician } from '../../hooks/useTechnician';
+import { useManufacture } from '../../hooks/useManufacture';
+import { Technicians } from '@/app/utils/types/entities';
+import { isStorageForm } from '../../helpers/formHelper';
+
+const generateFormBlocks = (formFields: PdfField[]) => {    
+    return Object.entries(formFieldMap).map(([key, value]) => {        
+        return {            
+            name: key,
+            fields: formFields.filter((field: any) => (value.includes(field.name) && field.require))
+        };
+    }).filter(block => block.fields.length);
+};
+
+
+interface Props {
+    form: PdfForm;
+    updateFields: (fields: FieldsObject[]) => void;
+    registerRef: (ref: SearchableDropdownHandle | null) => void;
+}
+
+const FormFields = ({ form, updateFields, registerRef }: Props) => {
+    
+    const { technicians } = useTechnician();
+    const { manufactures } = useManufacture();
+    
+    const [ provider, setProvider ] = useState<string | boolean>(false);
+    const [ showStorage, setShowStorage ] = useState(false);
+
+    const formFieldsRef = useRef<HTMLDivElement | null>(null);     
+    const formBlocks = useMemo(() => generateFormBlocks(form.formFields), [form.formFields]);
+    
+    //console.log('FormFields.render=>')
+
+    useEffect(() => {
+        // check if storage form 
+        if (form.name === 'inspection' && isStorageForm(form.formFields)) {            
+            toggleStorageFields();              
+        }
+    }, [JSON.stringify(form.formFields)]);
+    
+    const toggleStorageFields = () => {
+        setShowStorage(prev => !prev);
+    }
+    
+    const handleDropdownChange = useCallback((value: string, name: string, id?: number) => {           
+        if (name === 'provider') {
+            setProvider(value)
+        }            
+        if (id && (name === 'electrician-ls' || name === 'planner-ls')) setTechniciansDetails(name, value, id);
+    },[]);
+
+    const setTechniciansDetails = (type: string, val: string, id: number ) => {        
+        const technician = technicians.find((item) => item.id === id)
+        if (technician) {
+            let typeChar = type[0];               
+            updateFields([
+                {[type]: technician.name || ''}, 
+                {[typeChar+'email']: technician.email || ''}, 
+                {[typeChar+'license']: technician.license || ''}, 
+                {[typeChar+'phone']: technician.phone || ''}
+            ])            
+        }                                 
+    } 
+
+    return (
+        <>
+        <div ref={ formFieldsRef } className='form-body my-2'>            
+            {formBlocks.map((block, index) => {
+                // If no fields are found for this block, return null                 
+                if (!block.fields || block.fields.length === 0) return null;
+                
+                return (
+                    <div key={`block-${block.name}-${index}`}>                            
+                        {form.name === 'inspection' && block.name === 'storage' && (
+                            <label key={'storage-lable'} onClick={ toggleStorageFields } className="storage-toggle flex pt-2 content-center text-gray-400 text-sm min-w-10 py-auto font-medium ">
+                                טופס אגירה:                                   
+                            </label>                                        
+                        )}                                                        
+                        <div 
+                            className={`form-block py-2 border-b-2 border-slate-800 ${block.name}`}
+                            style={{ display: block.name === 'storage' && !showStorage ? 'none' : 'block' }}>
+                            {block.fields.map(field => (
+                                <Field 
+                                    key={`field-${field.name}`} 
+                                    registerRef={registerRef} 
+                                    field={ field } 
+                                    provider= { provider }
+                                    technicians={ technicians } 
+                                    manufactures={ manufactures }
+                                    dropdownChange={ handleDropdownChange }
+                                    />
+                                    
+                            ))}                    
+                        </div>                        
+                    </div>
+                );
+            })}
+        </div>        
+        </>    
+    )
+}
+
+export default FormFields

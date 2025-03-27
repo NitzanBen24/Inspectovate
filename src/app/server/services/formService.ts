@@ -1,13 +1,16 @@
-import { FieldsObject, FormField, FormPayload, PdfForm } from "@/app/utils/types/formTypes";
+import { FieldsObject, PdfField, FormPayload, PdfForm } from "@/app/utils/types/formTypes";
 import { addNewForm, getActiveForms, getActiveFormsByUserId, getFormById, updateForm } from "../lib/db/forms";
-import { ActionResponse } from "@/app/utils/types/apiTypes";
+import { ActionResponse } from "@/app/utils/types/general";
 import { appStrings } from "@/app/utils/AppContent";
 import { EmailInfo } from "@/app/utils/types/emailTypes";
 import { getPDFs, preparePdf } from "./pdfService";
 import { downloadImages } from "./storageService";
 import { prepareEmail, sendEmail } from "./emailService";
-import { User } from "@/app/utils/types/entities";
-import { sanitizeFields } from "../lib/formatData";
+import { formModel, User } from "@/app/utils/types/entities";
+import { sanitizeFields } from "../utils";
+import { getCompanyInfo } from "../lib/db/dbObject";
+import { isStorageForm } from "@/app/client/helpers/formHelper";
+import { error } from "console";
 
 /**
  * Refactor: this use is for tcelcric, might not needed for new customers
@@ -63,66 +66,81 @@ function _addStorageForm(inspection: PdfForm, storage: PdfForm) {
     return updatedSmallArray;
 }
 
-const _prepareFields = (payload: FormPayload): FieldsObject => {
+const _hasStorageForm = (formFields: PdfField[]) => {
+    return formFields.some(field => {
+        return (
+            (field.name === "batteries" || field.name === "capacity") &&
+            field.value !== null &&
+            field.value !== undefined &&
+            field.value !== ""
+        );
+    });
+}
+
+const _prepareFields = (payload: FormPayload): formModel => {
+
+    const customer = payload.form.formFields.find((field) => field.name === 'customer')?.value || ""    
      /** todo: consider move to seperate file  */
-    const queryFields: FieldsObject = {
+    const queryFields: formModel = {
         name: payload.form.name,
-        fields:JSON.stringify(payload.form.formFields),
-        user_id:payload.userId,
+        fields: payload.form.formFields,
+        customer: customer,
+        user_id: Number(payload.userId),
         user_name: payload.userName,        
-        storage: payload.form.images,
-        company_id: payload.company_id?.toString() || '-1',
-        company_name: payload.company_name || "company_name",
+        images: payload.form.images,
+        company_id: payload.company_id || -1,        
         status: payload.form.status,
     }
-    
-    return sanitizeFields(queryFields);
+    /** todo: sanitize form fields */
+    return queryFields//sanitizeFields(queryFields);
 }
 
-async function _saveData (form: PdfForm, fields:FieldsObject) {
+async function _saveData (form: PdfForm, fields:formModel) {
+
     if (!form.id) {
         return await addNewForm(fields);            
-    } else {        
-        const existingForm = await getFormById(form.id);
-        if (existingForm.error) {
-            return await addNewForm(fields);
-        } else {
-            return await updateForm(form.id, fields);
-        }
+    } else {   
+        return await updateForm(form.id, fields);        
     }
 }
 
-async function _prepareToSend (data: any): Promise<EmailInfo> {
+async function _generatePDF (data: any): Promise<(Uint8Array | { error: any })[]> {
+
     const pdfForms : PdfForm[] = [data.form];     
     //check for storage form
-    if (data.hasStorageForm.current) {                
+    if (isStorageForm(data.form.formFields)) {
         const storageForms = await getPDFs(['storage']);  
         if (!('error' in storageForms)) {
             storageForms[0].formFields = _addStorageForm(data.form, storageForms[0]);                                                        
             pdfForms.push(storageForms[0]);          
-        }        
-    }           
-    // Prepare PDF documents concurrently
-    const pdfDocs = await Promise.all(pdfForms.map((form) => preparePdf(form)));    
-    const email = prepareEmail(pdfForms[0].formFields, data.role, pdfForms[0].name);
-    email.attachments = pdfDocs;
+        }
+    }
     
-    return email;
+    const pdfDocs = await Promise.all(pdfForms.map((form) => preparePdf(form))); 
+           
+    // Check if one or more of the PDF wasn't generated
+    if (pdfDocs.some(doc => !(doc instanceof Uint8Array))) {// || pdfDocs.length === 0
+        throw { message: 'Somthing went wrong preparing PDF file' };
+    }
+
+    return pdfDocs;
+
 }
 /** consider a change function name */
-export const fieldsToForm = (fields: any[]) => {
-    return fields.map((record) => {        
+export const fieldsToForm = (fields: any[]): PdfForm[] => {
+    return fields.map((record) => {     
         return {
             id: record.id,
             name: record.name,
-            formFields: JSON.parse(record.fields),
+            formFields: record.fields,//JSON.parse(record.fields),
+            customer: record.customer,
             status: record.status,            
             userId: record.user_id.toString(),
             userName: record.user_name,
             company_id: Number(record.company_id),
-            company_name: record.company_name,
-            images: record.storage,
-            created: record.created_at,
+            //company_name: record.company_name,
+            images: record.images,
+            created_at: record.created_at,
         }
     });
 }
@@ -132,23 +150,24 @@ export const getUserActiveForms = async (user: User): Promise<PdfForm[]> => {
     return fieldsToForm(records);
 }
 
-export const saveForm = async (payload: FormPayload): Promise<ActionResponse> => {
+export const saveForm = async (payload: FormPayload): Promise<any> => {
 
     try {
     
         const fields = _prepareFields(payload)
         // DB actions
-        const dbResult = await _saveData(payload.form, fields);    
-                        
-        if (dbResult?.error) {
-            throw new Error(`Error, Failed save Form: ${dbResult.error}`);            
+        const saveResult = await _saveData(payload.form, fields);        
+        
+        if (!saveResult.length) {        
+            return { success: false, message: appStrings.actionFailed +' '+ appStrings.saveFailed }
         }
     
         return { success: true, message: appStrings.dataSaved }
 
-    } catch(error) {
-        console.error("Error, can not save Form!", error);
-        return { success: false, message: "An unexpected error occurred, can't save form", error };
+    } catch(error: any) {
+        console.error("Error: failed to save Form::", error.message);        
+        return { success: false, message: error.message, error };
+   
     }
     
 }
@@ -157,17 +176,25 @@ export const sendForm = async (payload: FormPayload) => {
 
     try {        
 
-        if (payload.form.images) {            
-            payload.form.images = await downloadImages(payload.form.images);            
-        }
+        // Download images from company storage
+        if (payload.form.images) {           
+            if(payload.company_id) {
+                const { storage_bucket: bucketName } = await getCompanyInfo(payload.company_id);            
+                payload.form.images = await downloadImages(payload.form.images, bucketName);                
+            } else {
+                payload.form.images = '';
+            }
+        }    
+
+        const pdfDocs = await _generatePDF(payload);
+
+        const email = prepareEmail(payload.form.formFields, pdfDocs, payload.role, payload.form.name);
         
-        const email = await _prepareToSend(payload);
+        return await sendEmail(email);            
         
-        return await sendEmail({ email });            
-        
-    } catch(error) {
-        console.error("Error, can not send Form!", error);
-        return { message: "An unexpected error occurred", error };
+    } catch(error: any) {
+        console.error("Error, can't send Form::", error.message);
+        return { success: false, message: "An unexpected error occurred", error };
     }
 
 }

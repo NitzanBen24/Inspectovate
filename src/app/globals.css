@@ -41,9 +41,9 @@ textarea[name="comments"] {
   align-items: center;
 }
 
-.storage {
+/* .storage {
   display: none;
-}
+} */
 
 .storage-toggle > svg {
   position: relative;

@@ -7,25 +7,22 @@ import axios, { AxiosError } from "axios";
 const _apiKey = process.env.NEXT_PUBLIC_API_KEY;  // Access client-side API key
 
 const fetchData = async <T>(path: string): Promise<T> => {
-    try {        
-        const { data } = await axios.get(`/api/${path}`, {
-            headers: {
-                'Authorization': `Bearer ${_apiKey}`, // Add the API key here
-            }
-        });
-        return data;
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Failed to fetch data');
-    }
+    
+    const { data } = await axios.get(`/api/${path}`, {
+        headers: {
+            'Authorization': `Bearer ${_apiKey}`, // Add the API key here
+        }
+    });
+    
+    return data;
+    
 };
 
-export const useFetch = <T>(key: string, path: string, options: Record<string, any>): UseQueryResult<T> => {     
-    //console.log('options=>', options)
+export const useFetch = <T>(key: string, path: string, options: Record<string, any>): UseQueryResult<T> => {         
     return useQuery({
-        queryKey: [key], 
-        queryFn: () => fetchData<T>(path),                       
+        queryKey: [key],         
+        queryFn: () => fetchData<T>(path),
         ...options,
-        retry: 2,   
     } as UseQueryOptions<T, Error>);
 };
 
@@ -54,17 +51,15 @@ export const useMultiFetch = <T extends unknown[]>(queries: QueryConfig<T[number
 
 // Function to handle POST requests (send data)
 const postData = async <T, R>(path: string, payload: T): Promise<R> => {
+
+    const { data } = await axios.post(`/api/${path}`, payload, {
+        headers: {
+            Authorization: `Bearer ${_apiKey}`,  // Add API key to headers
+        },
+    });
+
+    return data;
     
-    try {
-        const { data } = await axios.post(`/api/${path}`, payload, {
-            headers: {
-              Authorization: `Bearer ${_apiKey}`,  // Add API key to headers
-            },
-          });
-        return data;
-    } catch(error: any) {
-        throw new Error(error.response?.data?.message || 'Failed to post data');
-    }    
 };
 
 export const usePost = <T, R = any>(
@@ -86,7 +81,7 @@ export const usePost = <T, R = any>(
             // Call the optional onSuccess callback
             onSuccess?.(data);
         },
-        onError: (error) => {
+        onError: (error) => {            
             // Call the optional onError callback
             onError?.(error);
         },
@@ -176,19 +171,19 @@ const uploadData = async <R>(path: string, payload: UploadPayload): Promise<R> =
     }
     
 
-    try {
-      const { data } = await axios.post(`/api/${path}`, formData, {
+    //try {
+    const { data } = await axios.post(`/api/${path}`, formData, {
         headers: {
           'Authorization': `Bearer ${_apiKey}`,
           'Content-Type': 'multipart/form-data',
         },
-      });
+    });
       
-      return data; // Assuming the response returns an array of image URLs
-    } catch (error: any) {
-        /** todo: check error structure */
-        throw new Error(error.response?.data?.message || 'Image upload failed');
-    }
+    return data; // Assuming the response returns an array of image URLs
+    // } catch (error: any) {
+    //     console.log('error.here=>',error)
+    //     throw new Error(error.response?.data?.message || 'Image upload failed');
+    // }
 };
   
   
@@ -213,7 +208,6 @@ export const useImageUpload = < R = any>(
       },
       onError: (error) => {
         // Call onError callback if there is an error
-        console.log('onError!!',error)
         onError?.(error);
       },
     });

@@ -1,7 +1,7 @@
-import { FormField, PdfForm } from "./types/formTypes";
+import { PdfField, PdfForm } from "./types/formTypes";
 
 // Function to check if specific fields exist and have a non-empty value
-export const elementsWithValueExist = (array: FormField[], fieldNames: string[]): boolean => {
+export const elementsWithValueExist = (array: PdfField[], fieldNames: string[]): boolean => {
     return fieldNames.every((fieldName) => {
         const field = array.find((item) => item.name === fieldName);
         return field?.value !== undefined && field.value.trim() !== ''; // Ensure value is non-empty
@@ -78,11 +78,3 @@ export const dataURLtoBlob = (dataURL: string) => {
     }
     return new Blob([ab], { type: mimeString });
   };
-
-
-// todo: find the wright repo that is belong
-// export const tableNamesMap: Record<string, string> = {
-//     inspection: 'inspection_forms', 
-//     elevator: 'equipment_forms', 
-//     charge: 'equipment_forms',
-// }

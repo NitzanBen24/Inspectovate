@@ -1,5 +1,3 @@
-//import { updateFormStatus, deleteForm } from "@/app/lib/dbObject";
-
 import { formSubmit, searchForms } from "@/app/server/actions/formActions";
 import { deleteForm, updateFormStatus } from "@/app/server/lib/db/forms";
 
@@ -13,8 +11,10 @@ async function _handleFormsPost(payload:any) {
             return await formSubmit(payload);            
         case 'search':
             return await searchForms(payload.search);        
+        default:
+            return { success: false, message: 'no action!' };
     }
-    return { success: true, message: 'test', data:{} };
+    
 
 }
 
@@ -28,18 +28,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
 
         const result = await _handleFormsPost(payload);
-
+        
         if (result.error) {
-            return NextResponse.json(
-                { error: result.error || "Form submission failed", message: result.message },
+            return NextResponse.json(                
+                result,
                 { status: 500 }
             );
         }
 
-        return NextResponse.json( result );
-    } catch (error: unknown) {
-        console.error("Unknown error:", error instanceof Error ? error.stack : error);
-        return NextResponse.json({ error: "Unknown error occurred" }, { status: 500 });
+        return NextResponse.json(result);
+    } catch (error: any) {
+        console.error("Unknown error in POST Form:", error);        
+        return NextResponse.json({ message: error.message || "Unknown error occurred" }, { status: 500 });
     }
 }
 
@@ -62,7 +62,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
 
         return NextResponse.json({ success: true, message: result.message });
     } catch (error: unknown) {
-        console.error("Error updating form:", error instanceof Error ? error.stack : error);
+        console.error("Error updating form:", error);
         return NextResponse.json({ error: "Failed to update form" }, { status: 500 });
     }
 }

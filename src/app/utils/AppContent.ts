@@ -1,3 +1,4 @@
+import { error } from "console"
 
 export const formMessages = {
     missingPower: 'על מנת לשלוח טופס תקין, חובה למלא מודל ואת מספר המודלים',
@@ -11,10 +12,8 @@ export const sysStrings = {
   },
   database: {
     saveFailed: 'Saving data failed!',
+    error: 'Somthing went worng with DB connection',
   },
-  storage: {
-    uploadFailed: '!העלאת תמונות נכשלה'
-  }
 }
 
 export const appStrings = {
@@ -23,11 +22,30 @@ export const appStrings = {
     failed: 'שליחת המייל נכשלה. ודאו שחיבור האינטרנט תקין ונסו שוב.'
   },
   dataSaved: 'הפרטים נשמרו בהצלחה. ',
-  dataSavedError: 'לא הצלחנו לשמור את הנתונים. אנא נסו שוב או פנו לתמיכה במידה שהבעיה נמשכת.',
+  dataSavedfailed: '...שמירת הנתונים נכשלה. אנא בדקו את חיבור האינטרנט',
   archive: 'ארכיון',
   clear: 'נקה',
   missigRecords: 'לא נמצאו רשומות מתאימות...',
-  attchmentsExists: '..טופס זה כולל תמונות' 
+  attchmentsExists: '..טופס זה כולל תמונות',
+  account: {
+    invalid: 'פרטי החשבון לא מורשים',    
+  },
+  connection: {
+    fail: 'בדוק את חיבור האינטרנט'
+  },
+  search: {
+    error: 'לא ניתן לחפש רשומות כעת.. נסה שוב מאוחר יותר'
+  },
+  actionFailed: 'הפעולה נכשלה!',
+  saveFailed: 'הפרטים לא נשמרו',
+  form: {
+    delete: 'הטופס נמחק בהצלחה',
+    archive: 'הטופס הועבר לארכיון',
+    updateFail: 'סטטוס הטופס לא עודכן',
+  },
+  storage: {
+    uploadFailed: 'העלאת תמונת נכשלה. נסה שוב מאוחר יותר'
+  }
   
 }
 

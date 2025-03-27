@@ -40,8 +40,8 @@ const Archive = ({ selectForm }: Props) => {
     };
 
     const handleSearchError = (err: any) => {        
-        setLoading(false);
-        setError(err.message || "Error fetching forms.");
+        setLoading(false);        
+        setError(appStrings.search.error);
     };
 
     const { mutate: searchRecords } = usePost(

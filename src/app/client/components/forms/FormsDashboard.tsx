@@ -7,6 +7,7 @@ import { useFetch } from '../../hooks/useQuery';
 import { Spinner } from '../ui/Spinner';
 import { useUser } from '../../hooks/useUser';
 import { PdfForm } from '@/app/utils/types/formTypes';
+import { ActionResponse } from '@/app/utils/types/general';
 
 
 
@@ -33,9 +34,10 @@ const RenderFormsLists = ({ records, selectForm }: { records: any[]; selectForm:
   
   
 const FormsDashboard = () => {
+	
     const { user } = useUser();
     const [ form, setForm ] = useState<PdfForm | undefined>();
-    const { data, isLoading, isError } = useFetch<PdfForm[]>(
+    const { data: forms, isLoading, isError } = useFetch<{ pdfFiles: PdfForm[]; activeForms: PdfForm[] }>(
         'formRecords', 
         `forms/${user.id}`,
         {            
@@ -43,37 +45,35 @@ const FormsDashboard = () => {
             refetchOnWindowFocus: true,
             staleTime: 5 * 60 * 1000, 
             cacheTime: 15 * 60 * 1000,
-        }
+            retry: 0,
+        },
     )
-    //console.log('Dashboard.forms=>data',data)
-    const  forms  = (data ?? { pdfFiles: [], activeForms: [] }) as 
-        { pdfFiles: PdfForm[]; activeForms: PdfForm[] };    
-
-    // Memoize the sortedRecords to avoid recalculating unnecessarily
-    const sortedRecords = useMemo(() => {
-        // Filter and organize the records by status
-        const files = forms.pdfFiles.filter((item) => item.name !== 'storage');// without storage form (אגירה)
-        const saved = forms.activeForms.filter((item) => item.status === 'saved' && item.userId === user.id.toString());
-        const pending = forms.activeForms.filter((item) => item.status === 'pending');
-        const sent = user.role !== 'user' ? forms.activeForms.filter((item) => item.status === 'sent') : [];
-
-        return [
-            { files },
-            { saved },
-            { pending },
-            { sent },
-        ];
-    }, [forms, user.id, user.role]);
     
     const selectForm = (cform: PdfForm) => {
-      setForm(cform);
+		setForm(cform);
     }
     const closeForm = () => setForm(undefined);  
-  
-    if (isLoading) return <Spinner />
-    if (isError) return <div>Error loading data.</div>;    
+	
+    if (isLoading) return <Spinner />    
+    if (isError|| !forms || Object.keys(forms).length === 0) return <div>Error fetching data.</div>;    
     
-    //console.log('DaschBoard.forms=>',forms)
+	//console.log('FormsDashboard.render=>', forms)
+
+    const sortedRecords = () => {        
+      // Filter and organize the records by status
+      const files = forms.pdfFiles.filter((item) => item.name !== 'storage');// without storage form (אגירה)
+      const saved = forms.activeForms.filter((item) => item.status === 'saved' && item.userId === user.id.toString());
+      const pending = forms.activeForms.filter((item) => item.status === 'pending');
+      const sent = user.role !== 'user' ? forms.activeForms.filter((item) => item.status === 'sent') : [];
+
+      return [
+          { files },
+          { saved },
+          { pending },
+          { sent },
+      ];
+  	}
+    //useMemo(, [forms, user.id, user.role]);    
     
     return (    
 
@@ -82,7 +82,7 @@ const FormsDashboard = () => {
             <Form close={closeForm} form={form} />
             ) : (     
              <>        
-                 <RenderFormsLists records={sortedRecords} selectForm={selectForm} /> 
+                 <RenderFormsLists records={sortedRecords()} selectForm={selectForm} /> 
                  { (user.role !== 'user') && <Archvie selectForm={selectForm}/> }
             </>   
             )}      

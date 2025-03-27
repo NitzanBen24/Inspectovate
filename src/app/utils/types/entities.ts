@@ -1,3 +1,4 @@
+import { PdfField } from "./formTypes";
 
 
 export interface User {
@@ -6,7 +7,7 @@ export interface User {
     email: string;
     role: string;
     company_id?:number;
-    company_name?: string;
+    //company_name?: string;
     created_at?: string;
     isLoggedIn?: boolean; 
 }
@@ -27,4 +28,18 @@ export interface Technicians {
     license: string;
     phone: string;
     profession: string;
+}
+
+export interface formModel {    
+    id?: number;
+    name: string;    
+    fields: PdfField[];
+    created_at?: string;
+    status: string;
+    customer:string;
+    images: string;
+    user_id: number;
+    user_name: string;
+    company_id?:number;
+    //company_name?: string;
 }

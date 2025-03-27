@@ -16,11 +16,6 @@ export interface AuthFail {
     error: string;
 }
 
-export interface ActionResponse {
-    message: string;
-    success?: boolean;
-    error?: unknown;
-}
 
 export interface apiPayload {
     message: string;

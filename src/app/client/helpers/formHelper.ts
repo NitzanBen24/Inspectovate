@@ -1,7 +1,7 @@
 import { formFieldMap } from "@/app/utils/AppContent";
 import { elementsWithValueExist } from "@/app/utils/helper";
 
-import { FieldsObject, FormField } from "@/app/utils/types/formTypes";
+import { FieldsObject, PdfField } from "@/app/utils/types/formTypes";
 
 
 
@@ -38,7 +38,11 @@ export const calcPower = (formNode:HTMLDivElement | null): number | false => {
 }
 
 // Bad function name
-export const addInspectionFields = (formFields: FormField[], formRef: React.MutableRefObject<HTMLDivElement | null>): FieldsObject[] => {
+/** 
+ * todo: refactor this method
+ * 'ocheck' checkbox is only use form 'omega' field check how to improve code
+ */
+export const addInspectionFields = (formFields: PdfField[], formRef: React.MutableRefObject<HTMLDivElement | null>): FieldsObject[] => {
 
     let addFields = [];
 
@@ -65,16 +69,16 @@ export const addInspectionFields = (formFields: FormField[], formRef: React.Muta
 }
 
 // Create blocks with a key to render 
-export const generateFormBlocks = (formFields: FormField[]) => {
-    return Object.entries(formFieldMap).map(([key, value]) => {        
-        return {            
-            name: key,
-            fields: formFields.filter((field: any) => (value.includes(field.name) && field.require))
-        };
-    });
-};
+// export const generateFormBlocks = (formFields: PdfField[]) => {
+//     return Object.entries(formFieldMap).map(([key, value]) => {        
+//         return {            
+//             name: key,
+//             fields: formFields.filter((field: any) => (value.includes(field.name) && field.require))
+//         };
+//     }).filter(block => block.fields.length);
+// };
 
-export const isStorageForm = (block: FormField[]): boolean => {     
+export const isStorageForm = (block: PdfField[]): boolean => {     
     return block.filter((field) => field.name === 'batteries' || field.name === 'capacity' || field.name === 'bmanufacture').some((item) => {
         if (item.value && item.value.length > 0) {                          
             return true;            
