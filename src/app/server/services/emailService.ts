@@ -13,14 +13,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// interface MailOptions {
-//   email: EmailInfo;  
-// }
 
-export const prepareEmail = (formFields: PdfField[], attachments: any, role: string, formName: string): EmailInfo => {
+export const prepareEmail = (receiver: string, formFields: PdfField[], attachments: any): EmailInfo => {
     
+    /** todo: add subject => now provider is subject */
     const options: EmailInfo = {};  
-    const emailFields = ['customer', 'provider', 'message', 'reciver'];
+    const emailFields = ['customer', 'provider', 'message'];
 
     formFields.forEach((item) => {
         if (emailFields.includes(item.name as keyof EmailInfo) && item.value) {
@@ -33,14 +31,7 @@ export const prepareEmail = (formFields: PdfField[], attachments: any, role: str
         options.attachments = attachments;
     }
 
-    // // Alpha version => Testing  
-    // options.reciver = (role === 'admin' || formName === 'inspection') ? 'hazanreport@gmail.com' : 'tcelctric@gmail.com';
-    // const reciverField = formFields.find((item) => item.name === 'reciver');
-    // if (reciverField) {    
-    //   options.reciver = 'nitzanben24@gmail.com';
-    // }
-
-    options.reciver = 'nitzanben24@gmail.com';
+    options.receiver = receiver;
     
     // Return the final EmailInfo object 
     return options;
@@ -48,7 +39,7 @@ export const prepareEmail = (formFields: PdfField[], attachments: any, role: str
 
 export async function sendEmail( email: EmailInfo): Promise<any> {
   
-    if (!email.reciver || !email.customer || !email.attachments) {
+    if (!email.receiver || !email.customer || !email.attachments) {
         const error = sysStrings.email.failedMessage + sysStrings.email.missingInfo;
         console.error(error);
         return { success: false, message: error, error };
@@ -65,12 +56,12 @@ export async function sendEmail( email: EmailInfo): Promise<any> {
 
         const options = {
             from: process.env.EMAIL_USER,
-            to: email.reciver,
+            to: email.receiver,
             subject: email.provider || '',
             text: email.message || '',
             attachments,
         };
-
+// todo: handle the await return
         await transporter.sendMail(options);        
 
         //LOGS

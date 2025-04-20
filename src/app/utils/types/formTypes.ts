@@ -4,6 +4,7 @@ export interface PdfField {
     type: string;
     require: boolean;
     value?:string;
+    options?: string[];
 }
 
 export interface PdfForm {
@@ -15,8 +16,7 @@ export interface PdfForm {
     userName?: string;
     created_at?: any;
     images?: any;
-    company_id?:number;
-    // company_name?: string;
+    company_id?:number;    
     signature?: any;
 }
 
@@ -29,9 +29,9 @@ export interface FormPayload {
     userId: string;
     userName: string;
     role: string;
-    company_id?: number;
-    //company_name?: string;
+    company_id: number;    
     sendMail?: boolean;
+    mailAddress?: string;
     hasStorage: boolean;
     action?: string
     files?: any[];

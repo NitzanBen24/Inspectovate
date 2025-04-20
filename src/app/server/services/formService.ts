@@ -1,16 +1,22 @@
-import { FieldsObject, PdfField, FormPayload, PdfForm } from "@/app/utils/types/formTypes";
-import { addNewForm, getActiveForms, getActiveFormsByUserId, getFormById, updateForm } from "../lib/db/forms";
-import { ActionResponse } from "@/app/utils/types/general";
+import { FormPayload, PdfForm } from "@/app/utils/types/formTypes";
+import { addNewForm, getActiveForms, getActiveFormsByUserId, getSearchForms, updateForm } from "../lib/db/forms";
 import { appStrings } from "@/app/utils/AppContent";
-import { EmailInfo } from "@/app/utils/types/emailTypes";
-import { getPDFs, preparePdf } from "./pdfService";
+import { getPdfForms, generateDocumnet } from "./pdfService";
 import { downloadImages } from "./storageService";
 import { prepareEmail, sendEmail } from "./emailService";
 import { formModel, User } from "@/app/utils/types/entities";
-import { sanitizeFields } from "../utils";
-import { getCompanyInfo } from "../lib/db/dbObject";
-import { isStorageForm } from "@/app/client/helpers/formHelper";
-import { error } from "console";
+import { getRole } from "../lib/db/users";
+import { buildFormModel, mapFieldsToForms } from "../utils/formUtils";
+import { getCachedCompanyInfo } from "../lib/cache/companyInfoCache";
+import { isStorageForm } from "@/app/utils/helper";
+
+
+type ServiceResult<T = any> = {
+    success: boolean;
+    message: string;
+    data?: T;
+    error?: any;
+  };  
 
 /**
  * Refactor: this use is for tcelcric, might not needed for new customers
@@ -66,97 +72,64 @@ function _addStorageForm(inspection: PdfForm, storage: PdfForm) {
     return updatedSmallArray;
 }
 
-const _hasStorageForm = (formFields: PdfField[]) => {
-    return formFields.some(field => {
-        return (
-            (field.name === "batteries" || field.name === "capacity") &&
-            field.value !== null &&
-            field.value !== undefined &&
-            field.value !== ""
-        );
-    });
-}
-
-const _prepareFields = (payload: FormPayload): formModel => {
-
-    const customer = payload.form.formFields.find((field) => field.name === 'customer')?.value || ""    
-     /** todo: consider move to seperate file  */
-    const queryFields: formModel = {
-        name: payload.form.name,
-        fields: payload.form.formFields,
-        customer: customer,
-        user_id: Number(payload.userId),
-        user_name: payload.userName,        
-        images: payload.form.images,
-        company_id: payload.company_id || -1,        
-        status: payload.form.status,
-    }
-    /** todo: sanitize form fields */
-    return queryFields//sanitizeFields(queryFields);
-}
-
-async function _saveData (form: PdfForm, fields:formModel) {
-
-    if (!form.id) {
-        return await addNewForm(fields);            
-    } else {   
-        return await updateForm(form.id, fields);        
-    }
-}
-
-async function _generatePDF (data: any): Promise<(Uint8Array | { error: any })[]> {
+const _generatePdfDocs = async (data: any): Promise<(Uint8Array | any)[]> => {
 
     const pdfForms : PdfForm[] = [data.form];     
-    //check for storage form
+    //check for storage form    
     if (isStorageForm(data.form.formFields)) {
-        const storageForms = await getPDFs(['storage']);  
-        if (!('error' in storageForms)) {
-            storageForms[0].formFields = _addStorageForm(data.form, storageForms[0]);                                                        
-            pdfForms.push(storageForms[0]);          
-        }
+        const { forms: storageForms } = await getPdfForms(['storage']);        
+        storageForms[0].formFields = _addStorageForm(data.form, storageForms[0]);                                                        
+        pdfForms.push(storageForms[0]);
     }
+
+    return await Promise.all(pdfForms.map((form) => generateDocumnet(form))); 
+
+}
+
+const _getReceiver = async (compID: number, userID: string, formName: string) => {
+
+    const { comp_email: compEmail, report_email: repoEmail } = await getCachedCompanyInfo(compID);
+/** Refacrtor this */
+    if (compID === 4) {
+        
+        const { role } = await getRole(userID);
+        const receiver = (role === 'supervisor' && formName !== 'inspection') ? compEmail : repoEmail;
+        
+        return receiver;        
+    }
+
+    return repoEmail;
     
-    const pdfDocs = await Promise.all(pdfForms.map((form) => preparePdf(form))); 
-           
-    // Check if one or more of the PDF wasn't generated
-    if (pdfDocs.some(doc => !(doc instanceof Uint8Array))) {// || pdfDocs.length === 0
-        throw { message: 'Somthing went wrong preparing PDF file' };
+}
+
+const _saveData = async (payload: FormPayload, fields:formModel) => {
+    
+    const { short_name: tbl } = await getCachedCompanyInfo(payload.company_id);
+
+    if (!payload.form.id) {
+        return await addNewForm(fields, tbl);            
+    } else {   
+        return await updateForm(payload.form.id, fields, tbl);        
     }
-
-    return pdfDocs;
-
-}
-/** consider a change function name */
-export const fieldsToForm = (fields: any[]): PdfForm[] => {
-    return fields.map((record) => {     
-        return {
-            id: record.id,
-            name: record.name,
-            formFields: record.fields,//JSON.parse(record.fields),
-            customer: record.customer,
-            status: record.status,            
-            userId: record.user_id.toString(),
-            userName: record.user_name,
-            company_id: Number(record.company_id),
-            //company_name: record.company_name,
-            images: record.images,
-            created_at: record.created_at,
-        }
-    });
 }
 
-export const getUserActiveForms = async (user: User): Promise<PdfForm[]> => {
-    const records = (user.role === 'admin') ? await getActiveForms() : await getActiveFormsByUserId(user.id);
-    return fieldsToForm(records);
+
+export const getUserActiveForms = async (user: User, tblShort: string ): Promise<PdfForm[]> => {
+    
+    const records = (user.role === 'admin') 
+        ? await getActiveForms(tblShort) 
+        : await getActiveFormsByUserId(user.id, tblShort);
+
+    return mapFieldsToForms(records);
 }
 
 export const saveForm = async (payload: FormPayload): Promise<any> => {
 
     try {
-    
-        const fields = _prepareFields(payload)
+        
+        const fields = buildFormModel(payload);
         // DB actions
-        const saveResult = await _saveData(payload.form, fields);        
+        const saveResult = await _saveData(payload, fields);        
         
         if (!saveResult.length) {        
             return { success: false, message: appStrings.actionFailed +' '+ appStrings.saveFailed }
@@ -177,18 +150,20 @@ export const sendForm = async (payload: FormPayload) => {
     try {        
 
         // Download images from company storage
-        if (payload.form.images) {           
-            if(payload.company_id) {
-                const { storage_bucket: bucketName } = await getCompanyInfo(payload.company_id);            
-                payload.form.images = await downloadImages(payload.form.images, bucketName);                
-            } else {
-                payload.form.images = '';
-            }
+        if (payload.form.images && payload.company_id) {
+            const { storage_bucket: bucketName } = await getCachedCompanyInfo(payload.company_id);
+            payload.form.images = await downloadImages(payload.form.images, bucketName);                            
         }    
+     
+        const receiver = await _getReceiver(payload.company_id, payload.userId, payload.form.name);  
+        const pdfDocs = await _generatePdfDocs(payload);   
 
-        const pdfDocs = await _generatePDF(payload);
+        // If PDF was not generated, dont send an empty email
+        if (pdfDocs.length === 0) {
+            return { success: false, message: "Missing attachments to send!" };
+        }
 
-        const email = prepareEmail(payload.form.formFields, pdfDocs, payload.role, payload.form.name);
+        const email = prepareEmail(receiver, payload.form.formFields, pdfDocs);
         
         return await sendEmail(email);            
         
@@ -197,4 +172,8 @@ export const sendForm = async (payload: FormPayload) => {
         return { success: false, message: "An unexpected error occurred", error };
     }
 
+}
+
+export const fetchSearchForms = async (queryFields: Record<string, any>, tbl: string) => {
+    return await getSearchForms(queryFields, tbl);
 }

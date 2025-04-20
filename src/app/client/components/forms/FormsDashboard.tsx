@@ -20,6 +20,7 @@ const RenderFormsLists = ({ records, selectForm }: { records: any[]; selectForm:
             const forms = list[key] as PdfForm[];          
             const addFilter = key !== 'files';
             const showList = key === 'files' || key === 'pending';
+            
             if (forms.length === 0) return null;
             
             return (
@@ -61,7 +62,7 @@ const FormsDashboard = () => {
 
     const sortedRecords = () => {        
       // Filter and organize the records by status
-      const files = forms.pdfFiles.filter((item) => item.name !== 'storage');// without storage form (אגירה)
+      const files = forms.pdfFiles.filter((item) => item.name !== 'storage');
       const saved = forms.activeForms.filter((item) => item.status === 'saved' && item.userId === user.id.toString());
       const pending = forms.activeForms.filter((item) => item.status === 'pending');
       const sent = user.role !== 'user' ? forms.activeForms.filter((item) => item.status === 'sent') : [];
@@ -73,7 +74,6 @@ const FormsDashboard = () => {
           { sent },
       ];
   	}
-    //useMemo(, [forms, user.id, user.role]);    
     
     return (    
 

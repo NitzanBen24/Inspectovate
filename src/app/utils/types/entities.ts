@@ -6,7 +6,7 @@ export interface User {
     name: string;
     email: string;
     role: string;
-    company_id?:number;
+    company_id:number;
     //company_name?: string;
     created_at?: string;
     isLoggedIn?: boolean; 
@@ -40,6 +40,5 @@ export interface formModel {
     images: string;
     user_id: number;
     user_name: string;
-    company_id?:number;
-    //company_name?: string;
+    company_id?:number;    
 }

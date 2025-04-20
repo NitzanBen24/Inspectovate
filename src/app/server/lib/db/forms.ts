@@ -6,21 +6,19 @@ import { formModel } from "@/app/utils/types/entities";
 import { PostgrestError } from "@supabase/supabase-js";
 import { appStrings, sysStrings } from "@/app/utils/AppContent";
 
+const TABLE_NAME = '_forms_records';
 
-const _setErrorMessage = (error: any) => {//, act: string
-
-
+const _setErrorMessage = (error: any) => {
     if (!error.message) {
         error.message = sysStrings.database.error;
     }
-
     return error;
 }
  
-export const getActiveForms = async (): Promise<formModel[]> => {
-
+export const getActiveForms = async (tbl: string): Promise<formModel[]> => {
+    
     const { data, error } = await supabase
-        .from('forms_records')
+        .from(`${tbl}${TABLE_NAME}`)
         .select('*')
         .neq('status', 'archive') // Filter: status not 'archive'
         .order("created_at", { ascending: false }); // Ensure latest data
@@ -30,19 +28,13 @@ export const getActiveForms = async (): Promise<formModel[]> => {
         throw error;
     }
 
-    // Remove 'user_id' from each form object
-    // const filteredData = data.map((item: formModel) => {
-    //     const { user_id, ...rest } = item;
-    //     return rest;
-    // });
-
     return data;
 };
 
-export const getActiveFormsByUserId = async (id: number): Promise<formModel[]> => {
+export const getActiveFormsByUserId = async (id: number, tbl: string): Promise<formModel[]> => {
     
     const { data, error } = await supabase
-        .from('forms_records')
+        .from(`${tbl}${TABLE_NAME}`)
         .select('*')
         .eq('user_id', id)
         .neq('status', 'archive')
@@ -56,10 +48,10 @@ export const getActiveFormsByUserId = async (id: number): Promise<formModel[]> =
     return data;
 }
 
-export const getFormById = async (id: number): Promise<formModel[]> => {
+export const getFormById = async (id: number, tbl: string): Promise<formModel[]> => {
     
     const { data, error } = await supabase
-      .from('forms_records')
+      .from(`${tbl}${TABLE_NAME}`)
       .select('*')
       .eq('id', id);
 
@@ -71,9 +63,9 @@ export const getFormById = async (id: number): Promise<formModel[]> => {
     return data;
 };
 
-export const addNewForm = async (payload: formModel): Promise<any> => {
-
-    const { error, data } = await supabase.from('forms_records').insert(payload).select();
+export const addNewForm = async (payload: formModel, tbl: string): Promise<any> => {
+    
+    const { error, data } = await supabase.from(`${tbl}${TABLE_NAME}`).insert(payload).select();
 
     if (error) {
         console.error('Error: failed to insert new data::', error);        
@@ -83,28 +75,28 @@ export const addNewForm = async (payload: formModel): Promise<any> => {
     return data;
 }
 
-export const updateForm = async (id: string | number, payload: formModel): Promise<any> => {  
+export const updateForm = async (id: string | number, payload: formModel, tbl: string): Promise<any> => {  
     
     const { error, data } = await supabase
-        .from('forms_records')
+        .from(`${tbl}${TABLE_NAME}`)
         .update(payload)
         .eq('id', id) // Assuming `id` is the primary key column name
         .select();
 
     if (error) {        
-        console.error('Error: failed to update form::=>',error)        
+        console.error('Error: failed to update form::',error)        
         throw _setErrorMessage(error);
     }
     
     return data;
 };
 
-export const updateFormStatus = async (payload: {id: string , status: string}): Promise<any> => {
+export const updateFormStatus = async (id: string | number, status: string, tbl: string): Promise<any> => {
 
     const { error } = await supabase
-        .from('forms_records')
-        .update({ status: payload.status }) // Update only the status field
-        .eq("id", payload.id) // Match the record by its ID
+        .from(`${tbl}${TABLE_NAME}`)
+        .update({ status: status }) // Update only the status field
+        .eq("id", id) // Match the record by its ID
         .select();
         
     if (error) {        
@@ -116,10 +108,25 @@ export const updateFormStatus = async (payload: {id: string , status: string}): 
 
 };
 
-export const  deleteForm = async (id:string): Promise<any> => {
+export const archiveSentForms = async (tbl: string): Promise<{ message: string; success: boolean }> => {
+    const { error } = await supabase
+      .from(`${tbl}${TABLE_NAME}`) // safely build the full table name
+      .update({ status: 'archive' })
+      .eq('status', 'sent'); // only update rows where status is 'sent'
+  
+    if (error) {
+        console.error('Error archiving sent forms:', error.message);
+        throw _setErrorMessage(error);
+    }
+  
+    return { message: appStrings.form.archive, success: true };
+  };
+  
+
+export const  deleteForm = async (id: number, tbl: string): Promise<{success: boolean, message?: string, error?: any}> => {
 
     const { error } = await supabase
-        .from('forms_records')
+        .from(`${tbl}${TABLE_NAME}`)
         .delete() // Delete the record
         .eq("id", id); // Match the record by its ID
 
@@ -132,9 +139,9 @@ export const  deleteForm = async (id:string): Promise<any> => {
 
 }
 
-export const getSearchForms = async (searchQuery: SearchData): Promise<any> => {
-        
-    let query = supabase.from('forms_records').select('*').eq('status', 'archive');
+export const getSearchForms = async (searchQuery: SearchData, tbl: string): Promise<any> => {
+
+    let query = supabase.from(`${tbl}${TABLE_NAME}`).select('*').eq('status', 'archive');
     // Add filters dynamically
     Object.entries(searchQuery).forEach(([key, value]) => {
     if (key === 'created_at') {
@@ -150,7 +157,7 @@ export const getSearchForms = async (searchQuery: SearchData): Promise<any> => {
     const { data, error } = await query;
 
     if (error) {
-        console.error('Error fetching: getSearchForms:', error);            
+        console.error('Error fetching: Search Forms:', error);            
         throw _setErrorMessage(error);
     }
     

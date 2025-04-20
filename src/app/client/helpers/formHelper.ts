@@ -68,25 +68,6 @@ export const addInspectionFields = (formFields: PdfField[], formRef: React.Mutab
     return addFields;
 }
 
-// Create blocks with a key to render 
-// export const generateFormBlocks = (formFields: PdfField[]) => {
-//     return Object.entries(formFieldMap).map(([key, value]) => {        
-//         return {            
-//             name: key,
-//             fields: formFields.filter((field: any) => (value.includes(field.name) && field.require))
-//         };
-//     }).filter(block => block.fields.length);
-// };
-
-export const isStorageForm = (block: PdfField[]): boolean => {     
-    return block.filter((field) => field.name === 'batteries' || field.name === 'capacity' || field.name === 'bmanufacture').some((item) => {
-        if (item.value && item.value.length > 0) {                          
-            return true;            
-        }                       
-        return false;
-    });    
-}
-
 // todo: can be used also not in Form component => should be move to a general folder
 export const reverseDateDirection = (date: string) => {
     return date.split('-').reverse().join('-')

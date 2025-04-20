@@ -62,7 +62,7 @@ export const formFieldMap = {
     //storage
     storage: ['batteries','capacity', 'bmanufacture'],
     //elevator
-    elevator: ['elevator', 'mainbreaker', 'mainbreakersize'],
+    elevator: ['elevator', 'mainbreaker', 'mainbreakersize', 'officenum', 'checkgrounding', 'checkamper'],
     //charge
     charge: ['station', 'manufacture', 'model', 'power',  'maxcurrent', 'breakersize'],
     end: ['comments', 'message'],
@@ -105,6 +105,9 @@ export const fieldsNameMap: any = {
     elevator: 'מספר מעלית',
     mainbreaker: 'מפסק ראשי',
     mainbreakersize: 'גודל מפסק ראשי',
+    officenum: 'מספר משרד',
+    checkamper: 'גודל המבטח',
+    checkgrounding: 'סוג הארקה',
     //charge
     station: 'מספר עמדה',
     manufacture: 'שם היצרן',
@@ -117,4 +120,3 @@ export const fieldsNameMap: any = {
 export const facillties = ['מחסן','לול','רפת','גג','תעשייה','מבנה מסחרי','מבנה מגורים'];
 
 export const appDropDwons = ['electrician', 'planner', 'facillity', 'convertor', 'panel'];
-

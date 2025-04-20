@@ -4,7 +4,7 @@ export interface EmailInfo {
     customer?: string;
     provider?: string;
     message?: string;
-    reciver?: string;
+    receiver?: string;
     attachments? :any [];
 }
 

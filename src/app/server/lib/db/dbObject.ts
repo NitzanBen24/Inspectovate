@@ -3,7 +3,6 @@ import { supabase } from "../supabase";
 
 export const getCompanyInfo = async (company_id: number): Promise<any> => {
 
-    
     const { data, error } = await supabase
         .from('companies')
         .select('*')
@@ -16,7 +15,6 @@ export const getCompanyInfo = async (company_id: number): Promise<any> => {
     }
     
     return data;
-    
 }
 
 

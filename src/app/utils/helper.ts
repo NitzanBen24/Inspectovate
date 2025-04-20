@@ -1,5 +1,15 @@
 import { PdfField, PdfForm } from "./types/formTypes";
 
+
+export const isStorageForm = (block: PdfField[]): boolean => {     
+  return block.filter((field) => field.name === 'batteries' || field.name === 'capacity' || field.name === 'bmanufacture').some((item) => {
+      if (item.value && item.value.length > 0) {                          
+          return true;            
+      }                       
+      return false;
+  });    
+}
+
 // Function to check if specific fields exist and have a non-empty value
 export const elementsWithValueExist = (array: PdfField[], fieldNames: string[]): boolean => {
     return fieldNames.every((fieldName) => {
@@ -47,7 +57,8 @@ export const getHebrewString = (str: string): string => {
         archvie: 'ארכיון',
         signature: 'הוסף חתימה',
         evolt: 'evolt',
-        inspectest: 'דוגמא בדיקה'
+        inspectest: 'דוגמא בדיקה',
+        schindler: 'שינדלר',
       }
   
     return options[str];

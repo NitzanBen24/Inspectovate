@@ -4,7 +4,7 @@ import { getUserByEmail } from '../lib/db/users';
 
 
 
-export const isUserExists = async (email: string, password: string): Promise<User | null> => {
+export async function isUserExists (email: string, password: string): Promise<User | null> {
     
     try {                
 
@@ -28,4 +28,4 @@ export const isUserExists = async (email: string, password: string): Promise<Use
         return null;
     }
 
-  };
+};

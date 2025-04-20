@@ -63,12 +63,11 @@ const Form = ({ form, close }: Props) => {
     }, [form.formFields])
 
     console.log('Form.render=>',form)
-    console.log('Form.render=>user',user)
 
     const handleSubmitSuccess = (res: any) => {   
-        console.log('succes.res=>',res)
+        
         if (form.status === 'sent') {
-            form.status = 'send';
+            form.status = 'done';
             sendMail.current = true;
             submitForm(form);
         } else {
@@ -140,7 +139,7 @@ const Form = ({ form, close }: Props) => {
         
         //inspections form only
         if (form.name === 'inspection') {// || form.name === 'בדיקה'
-            const fieldsToRemove = ['reciver','status'];
+            const fieldsToRemove = ['status'];
             form.formFields = form.formFields.filter((item) => !fieldsToRemove.includes(item.name));    
         }        
         
@@ -159,7 +158,7 @@ const Form = ({ form, close }: Props) => {
         dropdownRefs.current.forEach((ref) => ref.clear());
     };
 
-    const updateFormStatus = (btnId: string) => {
+    const setFormStatus = (btnId: string) => {
         
         if (btnId === 'BtnSave') {       
             form.status = 'saved';        
@@ -202,14 +201,14 @@ const Form = ({ form, close }: Props) => {
         setDate();        
 
         // Alpha version => Testing        
-        const sendToMe = sendRef.current?.querySelector<HTMLInputElement>('[name="reciver"]');    
-        if (sendToMe && sendToMe.checked) {            
-            form.formFields.push({
-                name: 'reciver',
-                type: 'TextArea',
-                require:false,                 
-            });
-        }       
+        // const sendToMe = sendRef.current?.querySelector<HTMLInputElement>('[name="receiver"]');    
+        // if (sendToMe && sendToMe.checked) {            
+        //     form.formFields.push({
+        //         name: 'receiver',
+        //         type: 'TextArea',
+        //         require:false,                 
+        //     });
+        // }       
         
     }
     
@@ -217,13 +216,13 @@ const Form = ({ form, close }: Props) => {
         
         if (!event.currentTarget.id) {
             console.error('Error can not submit Form!!')
-            setMessage('Something went wrong, can not submit Form!!');
+            setMessage('Something went wrong, can not submit Form!');
             openModal()
         }
         
         setLoading(true);
         
-        updateFormStatus(event.currentTarget.id);
+        setFormStatus(event.currentTarget.id);
         
         prepareToSend();
 
@@ -234,7 +233,7 @@ const Form = ({ form, close }: Props) => {
                 images: images as File[],                
                 userId: user?.id
             });
-        } else {                        
+        } else {                                
             submitForm(form);
         }
     };
@@ -246,8 +245,7 @@ const Form = ({ form, close }: Props) => {
                 const inputField = field as HTMLInputElement | HTMLTextAreaElement;                  
                 const fieldName = inputField.getAttribute('name'); // Get the name attribute                
                 const fieldValue = inputField.value;
-                if (fieldName) {                     
-                    if (fieldName === "capacity") console.log("batteries=>", fieldValue)                   
+                if (fieldName) {                                       
                     const currFiled = form.formFields.find((item) => item.name === fieldName);
                     if (currFiled) {
                         currFiled.value = fieldValue;
@@ -257,26 +255,26 @@ const Form = ({ form, close }: Props) => {
         }
     }
 
-    const submitForm = (submissionForm: PdfForm) => {        
+    const submitForm = (submissionForm: PdfForm) => {           
         formSubmit({
             userId: submissionForm.userId || user.id, 
             userName: submissionForm.userName || user.name,
             role: user.role,
             form: submissionForm,
             company_id: submissionForm.company_id || user.company_id,            
-            sendMail: sendMail.current,             
+            sendMail: sendMail.current,
             action: 'submit'
         });
         
     }
 
-    const setFields = useCallback((fields: FieldsObject[]) => {
-        fields.forEach(item => {
-            const [key, value] = Object.entries(item)[0];
-            const field = form.formFields.find(f => f.name === key);
-            if (field && field.value) {
+    const setFields = useCallback((fields: FieldsObject[]) => {        
+        fields.forEach(item => {            
+            const [key, value] = Object.entries(item)[0];            
+            const field = form.formFields.find(f => f.name === key);            
+            if (field) {
                 field.value = value;
-            }//field.value = value;
+            }
         });        
     }, [form.formFields]);
     
@@ -326,6 +324,7 @@ const Form = ({ form, close }: Props) => {
                     indicate if the test has passed or faild 
                     consider move this to seperate file/repo
                 */}
+                {/** change field name stauts to different name, the meaning is if inspection passed or not */}
                 {form.name === 'inspection' && <div className='flex status-wrap mt-3'>
                     <label className='block text-sm min-w-20 content-center font-medium text-black'>תוצאה:</label>
                     <div className='flex items-center'>
@@ -367,10 +366,10 @@ const Form = ({ form, close }: Props) => {
             }                    
             
             {/* Alpha version => Testing */}
-            <div ref={ sendRef } className='staging-send flex mt-5'>
+            {/* <div ref={ sendRef } className='staging-send flex mt-5'>
                 <label className='mr-2'>Send to me</label>
-                <input type="checkbox" name="reciver" defaultChecked={false} id=""/>
-            </div>
+                <input type="checkbox" name="receiver" defaultChecked={false} id=""/>
+            </div> */}
             
         </div>
 

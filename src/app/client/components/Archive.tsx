@@ -54,7 +54,12 @@ const Archive = ({ selectForm }: Props) => {
     const search = () => {        
         setLoading(true);
         setError(null);
-        searchRecords({search:searchData, action: 'search'});
+        searchRecords({
+            search: searchData,
+            userId: user.id,
+            company_id: user.company_id,
+            action: 'search'
+        });
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

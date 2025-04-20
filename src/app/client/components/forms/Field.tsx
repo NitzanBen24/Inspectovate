@@ -7,6 +7,7 @@ import { Manufacture, Technicians } from '@/app/utils/types/entities';
 import { OptionKeys, OptionsMap } from '@/app/utils/types/customTypes';
 
 interface Props {
+    formName: string;
     field: PdfField;
     registerRef: (ref: SearchableDropdownHandle | null) => void;
     provider: string | boolean;
@@ -48,8 +49,8 @@ const getOptionsMap = (technicians: Technicians[], manufactures: Manufacture[], 
 
 // }
 
-const Field = ({ field, registerRef, technicians, manufactures, provider, dropdownChange }: Props) => {
-    
+const Field = ({ formName, field, registerRef, technicians, manufactures, provider, dropdownChange }: Props) => {
+    //console.log('Field=>',field)
     /**
      * todo: try to remove FieldType outside of the render
      * optionsMap & getListOptions only required for DropDown, so dont check every field
@@ -62,7 +63,7 @@ const Field = ({ field, registerRef, technicians, manufactures, provider, dropdo
         DropDown: (
             <SearchableDropdown 
                 ref={registerRef} 
-                options={getListOptions(field.name.replace("-ls", ""))} 
+                options={field.options || getListOptions(field.name.replace("-ls", ""))} 
                 fieldName={field.name}  
                 text="חפש" 
                 value={field.value || ''} 
@@ -96,7 +97,7 @@ const Field = ({ field, registerRef, technicians, manufactures, provider, dropdo
             
             { FieldType[field.type] || FieldType.TextField}
 
-            {field.name === 'omega' && (
+            {formName === 'inspection' && field.name === 'omega' && (
                 <>
                     <label className="block content-center mr-2 text-sm min-w-10 py-auto font-medium text-black">
                         תקין:
@@ -110,130 +111,3 @@ const Field = ({ field, registerRef, technicians, manufactures, provider, dropdo
 
 export default Field;
 
-
-
-
-
-
-
-
- // const renderField = (type: string) => {
-    //     console.log('type=>',type)
-
-
-
-    //     const listOptions = field.type === 'DropDown' ? getListOptions(field.name.replace("-ls", "")) : [];
-
-    //     if (field.type === 'DropDown') {
-    //         return (
-    //             <SearchableDropdown 
-    //                 ref={registerRef} 
-    //                 options={listOptions} 
-    //                 fieldName={field.name}  
-    //                 text="חפש" 
-    //                 value={field.value || ''} 
-    //                 onValueChange={dropdownChange} 
-    //             />
-    //         );
-    //     }
-    //     if (field.type === 'TextArea') {
-    //         return (
-    //             <textarea 
-    //                 className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" 
-    //                 key={field.name} 
-    //                 name={field.name} 
-    //                 rows={3} 
-    //                 required
-    //             />
-    //         );
-    //     }
-    //     return (
-    //         <input 
-    //             className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" 
-    //             type="text" 
-    //             key={field.name} 
-    //             name={field.name} 
-    //             required 
-    //         />
-    //     );
-    // };
-
-
-// const Field = ({ field, registerRef, technicians, manufactures,provider, dropdownChange }: Props) => {
-
-//     const providers = [...new Set(technicians.map((item: Technicians) => item.employer))];
-
-//     function getListOptions(name: string): string[] | ListOption[] {
-            
-//         const nameToArrayMap: Record<string, string[] | ListOption[]> = {
-//             provider: providers,
-//             electrician: technicians.filter((item) => item.profession === 'electrician' && item.employer === provider).map((item) => {
-//                 return {
-//                     val: item.name,
-//                     id: item.id
-//                 }
-//             }),
-//             planner: technicians.filter((item) => item.profession === 'planner' && item.employer === provider).map((item) => {
-//                 return {
-//                     val: item.name,
-//                     id: item.id
-//                 }
-//             }),
-//             convertor: manufactures.filter((item) => item.type === 'convertor' ||  item.type === 'both').map((item) => {
-//                 return item.name;
-//             }),
-//             panel: manufactures.filter((item) => item.type === 'panel' ||  item.type === 'both').map((item) => {
-//                 return item.name;
-//             }),
-//             facillity: facillties,
-//         };
-        
-//         // Return the array for the given name or an empty array if the name is not found
-//         return nameToArrayMap[name] || [];
-//     }
-        
-//     const addField = () => {
-        
-//         const listOptions = field.type === 'DropDown' ? getListOptions(field.name.replace("-ls", "")) : [];
-        
-//         if (field.type === 'DropDown') {
-//             return (
-//                  <SearchableDropdown ref={registerRef} options={listOptions} fieldName={field.name}  text="חפש" value={field.value || ''} onValueChange={dropdownChange} />
-//             );
-//         }
-//         if (field.type === 'TextArea') {
-//             return (
-//                 <textarea className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" key={field.name} name={field.name} rows={3} required/>
-//             );
-//         }
-        
-//         return (
-//             <input className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" type="text" key={field.name} name={field.name} required />
-//         );
-//     };
-
-//     return (
-//         <div key={`field-${field.name}`} className="form-item my-2 flex">
-//             <label className="block content-center text-sm min-w-20 font-medium text-black">
-//                 {fieldsNameMap[field.name.replace("-ls", '')]}:
-//             </label>               
-            
-//             {addField()}
-
-//             {}
-
-//             {/* Consider move this from here */}
-//             {field.name === 'omega' && (
-//                 <>
-//                     <label className="block content-center mr-2 text-sm min-w-10 py-auto font-medium text-black">
-//                         תקין:
-//                     </label>
-//                     <input type="checkbox" name="ocheck" defaultChecked={true} />
-//                 </>
-//             )}                
-//         </div>
-//     );
-
-// }
-
-// export default Field

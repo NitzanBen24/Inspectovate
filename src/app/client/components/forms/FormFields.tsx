@@ -7,7 +7,8 @@ import { SearchableDropdownHandle } from './SearchableDropdown';
 import { useTechnician } from '../../hooks/useTechnician';
 import { useManufacture } from '../../hooks/useManufacture';
 import { Technicians } from '@/app/utils/types/entities';
-import { isStorageForm } from '../../helpers/formHelper';
+import { isStorageForm } from '@/app/utils/helper';
+
 
 const generateFormBlocks = (formFields: PdfField[]) => {    
     return Object.entries(formFieldMap).map(([key, value]) => {        
@@ -56,7 +57,8 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
         if (id && (name === 'electrician-ls' || name === 'planner-ls')) setTechniciansDetails(name, value, id);
     },[]);
 
-    const setTechniciansDetails = (type: string, val: string, id: number ) => {        
+    const setTechniciansDetails = (type: string, val: string, id: number ) => {    
+        
         const technician = technicians.find((item) => item.id === id)
         if (technician) {
             let typeChar = type[0];               
@@ -90,6 +92,7 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
                                 <Field 
                                     key={`field-${field.name}`} 
                                     registerRef={registerRef} 
+                                    formName={ form.name }
                                     field={ field } 
                                     provider= { provider }
                                     technicians={ technicians } 
