@@ -8,9 +8,13 @@ import { pdfFillerFields, pdfFormFields, reverseEnglishAndNumbers } from '../uti
 
 function _extraFields(fileName: string): PdfField[] {
     
-    const moreFields = ['comments'];
+    const moreFields = [];
     if (fileName === 'inspection') {
         moreFields.push('message', 'provider','batteries','capacity', 'bmanufacture');
+    }
+
+    if (fileName !== 'bizpermit' && fileName !== 'schindler') {
+        moreFields.push('comments')
     }
     
     return moreFields.map((item) => ({
@@ -201,7 +205,11 @@ function _wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: numb
     return lines;
 }
 
-const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, font: PDFFont) => {
+/** 
+ * hfont = Hebrew
+ * efont = English
+ */
+const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, efont: PDFFont) => {
     
     if (form.company_id === 4 && form.name === 'inspection') {
         form.formFields = _addInspectionRep(form)
@@ -209,32 +217,37 @@ const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, font: PDFFont) =>
 
     // Text fields
     const fields = pdfForm.getFields();
+    
     fields
         .filter(field => field.constructor.name === 'PDFTextField')
         .forEach((field) => {            
             const fieldName = field.getName();
             const fieldType = field.constructor.name;
-            pdfFillerFields[fieldType]?.({fieldName, pdfForm, form, font})//as keyof typeof pdfFillerFields
+            pdfFillerFields[fieldType]?.({fieldName, pdfForm, form, hfont, efont});
         })
     
     // CheckBox fields      
-    const checkBoxes = fields.filter(field => field.constructor.name === 'PDFCheckBox')    
+    const checkBoxes = fields.filter(field => field.constructor.name === 'PDFCheckBox').map(item => item.getName());        
     if (checkBoxes.length) {
-        pdfFillerFields['PDFCheckBox']?.(pdfForm, checkBoxes, form.formFields.filter(field => field.type === 'DropDown'));
+        pdfFillerFields['PDFCheckBox']?.(pdfForm, form.formFields.filter(field => field.name.startsWith('check')));                
     }
         
 };
 
-const _getFormFields = (pdfForm: PDFForm): PdfField[] => {
-
+const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
+    
     const pdfFields = pdfForm.getFields();
     // CheckBox fields
-    const checkFields: PdfField[] = pdfFormFields['PDFCheckBox']?.(pdfFields.filter(field => field.constructor.name === 'PDFCheckBox'));    
-    // Text fields
-    const fields: PdfField[] = pdfFormFields['PDFTextField']?.(pdfFields);
+    const checkFields: PdfField[] = pdfFormFields['PDFCheckBox']?.(pdfFields.filter(field => field.constructor.name === 'PDFCheckBox'), formName);    
     
-    // Combine both arrays (regular fields and checkbox fields)
-    return [...fields, ...checkFields];
+    // tbl Fields
+    const tblFields: PdfField[] = pdfFormFields['tblField']?.(pdfFields.filter(field => (field.getName().startsWith('tbl_') && field.isRequired())), formName);
+
+    // Text fields
+    const fields: PdfField[] = pdfFormFields['PDFTextField']?.(pdfFields.filter(field => (field.constructor.name === 'PDFTextField' && !(field.getName().startsWith('tbl_')))));
+
+    // Combine both arrays (regular fields and checkbox fields)    
+    return [...fields, ...checkFields, ...tblFields];
 };
 
 // Get PDF files
@@ -258,7 +271,8 @@ export const getPdfForms = async (fileNames: string[]): Promise<{ forms: PdfForm
                     const pdfForm = pdfDoc.getForm();                  
                     
                     if (pdfForm) {                        
-                        form.formFields = _getFormFields(pdfForm);
+                        form.formFields = _getFormFields(pdfForm, form.name);
+                        //console.log('formfields!!',form.formFields)
                     }
 
                     form.formFields.push(..._extraFields(form.name));
@@ -296,31 +310,42 @@ export const generateDocumnet = async (form: PdfForm): Promise<Uint8Array | []> 
     
         // Load the Noto Sans Hebrew font from your local path
         const fontPath = path.resolve('./src/app/fonts/OpenSans-VariableFont_wdth,wght.ttf');
-        const boldFontPath = path.resolve('./src/app/fonts/OpenSans-Bold.ttf');
+        const boldFontPath = path.resolve('./src/app/fonts/OpenSans-Bold.ttf');  
+        const arielFontPath = path.resolve('./src/app/fonts/OpenSans-VariableFont_wdth,wght.ttf');        
         
         const fontBytes = fs.readFileSync(fontPath);
         const boldFontBytes = fs.readFileSync(boldFontPath); 
-        
+        const openSunsFontBytes = fs.readFileSync(arielFontPath); 
+            
         const hebrewFont = await pdfDoc.embedFont(new Uint8Array(fontBytes));    
-        const boldFont = await pdfDoc.embedFont(new Uint8Array(boldFontBytes));
+        const boldFont = await pdfDoc.embedFont(new Uint8Array(boldFontBytes));        
+        const openSunsFont = await pdfDoc.embedFont(new Uint8Array(openSunsFontBytes));        
     
         // Fill form fields in the main PDF with pdf-lib    
         const pdfForm = pdfDoc.getForm();
     
-        _fillPdfFields(pdfForm, form, hebrewFont);
+        _fillPdfFields(pdfForm, form, hebrewFont, openSunsFont);
     
         // only for ispections form
         if (form.name === 'inspection') {    
             _markInspectionResult(pdfForm, pdfDoc, form.formFields, boldFont)        
         }
 
-        //todo: add customer field to schindler form to have a receiver
+        //todo: move this to a seperate function
         if (form.name === 'schindler') {
             form.formFields.push({
                 name: 'customer',
                 type: 'PDFTextField',
                 require: true,
                 value: 'שינדלר'
+              })
+        }
+        if (form.name === 'bizpermit') {            
+            form.formFields.push({
+                name: 'customer',
+                type: 'PDFTextField',
+                require: true,
+                value: form.formFields.find(field => field.name === 'regnum')?.value || 'bizpermit',
               })
         }
         

@@ -3,8 +3,10 @@
 export interface EmailInfo {
     customer?: string;
     provider?: string;
+    subject?: string;
     message?: string;
     receiver?: string;
+    filename?: string;
     attachments? :any [];
 }
 

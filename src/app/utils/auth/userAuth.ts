@@ -35,8 +35,7 @@ export function addUserTkn(user: User): NextResponse {
       name: user.name, 
       email: user.email, 
       role:user.role, 
-      company_id: user.company_id,
-      //company_name: user.company_name,
+      company_id: user.company_id,      
     };
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1d' });
     

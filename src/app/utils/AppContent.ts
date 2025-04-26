@@ -65,8 +65,13 @@ export const formFieldMap = {
     elevator: ['elevator', 'mainbreaker', 'mainbreakersize', 'officenum', 'checkgrounding', 'checkamper'],
     //charge
     charge: ['station', 'manufacture', 'model', 'power',  'maxcurrent', 'breakersize'],
+    //bizpermit
+    bizpermit: ['filenum', 'bizname', 'biztype', 'regnum',  'city', 'street', 'addressnum', 'date', 'checkswitch'],
+    bizpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
+//'tbl_panel_pos1-ls', 'tbl_panel_num1', 'tbl_panel_ampsize1', 'tbl_panel_cut1-ls', 'tbl_panel_vis1-ls', 'tbl_panel_down1-ls'
     end: ['comments', 'message'],
     signature: ['signature']
+    
 }
 
 // FormFeilds
@@ -115,8 +120,46 @@ export const fieldsNameMap: any = {
     power: 'הספק',
     maxcurrent: 'זרם מרבי',
     breakersize: 'גודל המספק',
+    //bizpermit
+    filenum: 'מספר תיק',
+    bizname: 'שם העסק',
+    regnum: 'ח.פ',
+    biztype: 'מהות העסק',
+    city: 'יישוב',
+    street: 'רחוב',
+    addressnum: 'מס׳',
+    checkswitch: 'קיום מפסק',
+    tbl_panel_num: 'מספר הלוח',
+    tbl_panel_pos: 'מיקום הלוח',    
+    tbl_panel_ampsize: 'גודל האמפר',
+    tbl_panel_cut: 'ניתוק',
+    tbl_panel_vis: 'גילוי',
+    tbl_panel_down: 'כיבוי',
+
 }
 
 export const facillties = ['מחסן','לול','רפת','גג','תעשייה','מבנה מסחרי','מבנה מגורים'];
 
 export const appDropDwons = ['electrician', 'planner', 'facillity', 'convertor', 'panel'];
+
+const bizpermitOptions: Record<string, string[]> = {
+	'tbl_panel_pos-ls': ['בפנים', 'בחוץ'],
+	'tbl_panel_cut-ls': ['√', '–'],
+	'tbl_panel_vis-ls': ['√', '–'],
+	'tbl_panel_down-ls': ['√', '–'],
+	'checkswitch': ['חשמל חירום תקין', 'UPS תקין']
+  }
+
+
+export const dropDownOptionsMap: Record<string, typeof bizpermitOptions> = {
+	'bizpermit': bizpermitOptions
+}
+
+export const checkBoxesEndName: any = {
+	'bizpermit': {
+		'checkswitch': {
+			'חשמל חירום תקין': 'first', 
+			'UPS תקין': 'fourth'
+		}
+	}
+}

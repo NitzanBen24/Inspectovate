@@ -9,7 +9,7 @@ import { useUser } from '../../hooks/useUser';
 import { addInspectionFields, calcPower, formatHebrewDate } from '../../helpers/formHelper';
 import { SearchableDropdownHandle } from './SearchableDropdown';
 import { useImageUpload, usePost } from '../../hooks/useQuery';
-import { appStrings } from '@/app/utils/AppContent';
+import { appStrings, checkBoxesEndName } from '@/app/utils/AppContent';
 import { getHebrewFormName } from '@/app/utils/helper';
 import { Spinner } from '../ui/Spinner';
 import Modal from '../ui/Modal';
@@ -62,7 +62,7 @@ const Form = ({ form, close }: Props) => {
         });
     }, [form.formFields])
 
-    console.log('Form.render=>',form)
+   // console.log('Form.render=>',form)
 
     const handleSubmitSuccess = (res: any) => {   
         
@@ -165,7 +165,7 @@ const Form = ({ form, close }: Props) => {
         }
 
         if (btnId === 'BtnSend') {         
-            if (user.role === 'admin' || user.role === 'supervisor') {
+            if (user.role === 'admin' || (user.role === 'supervisor' && form.name !== 'inspection')) {
                 form.status = 'sent';                
             } else {
                 form.status = 'pending';
@@ -200,16 +200,6 @@ const Form = ({ form, close }: Props) => {
         
         setDate();        
 
-        // Alpha version => Testing        
-        // const sendToMe = sendRef.current?.querySelector<HTMLInputElement>('[name="receiver"]');    
-        // if (sendToMe && sendToMe.checked) {            
-        //     form.formFields.push({
-        //         name: 'receiver',
-        //         type: 'TextArea',
-        //         require:false,                 
-        //     });
-        // }       
-        
     }
     
     const handleFormSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {            
@@ -244,10 +234,15 @@ const Form = ({ form, close }: Props) => {
             [...fieldsCollection].forEach(field => {
                 const inputField = field as HTMLInputElement | HTMLTextAreaElement;                  
                 const fieldName = inputField.getAttribute('name'); // Get the name attribute                
-                const fieldValue = inputField.value;
+                let fieldValue = inputField.value;
                 if (fieldName) {                                       
                     const currFiled = form.formFields.find((item) => item.name === fieldName);
                     if (currFiled) {
+                        //todo: Optimize
+                        if (form.name === 'bizpermit' && fieldName === 'checkswitch') {                            
+                            fieldValue = checkBoxesEndName[form.name][fieldName][fieldValue];
+                        }
+                        
                         currFiled.value = fieldValue;
                     }                    
                 }                 
@@ -313,7 +308,7 @@ const Form = ({ form, close }: Props) => {
                 <div className='p-2'>            
                     <FontAwesomeIcon icon={faArrowLeft} onClick={goBack} />
                 </div>
-                <h2 className='text-2xl font-bold flex-grow text-right text-gray-800'>{'טופס ' + getHebrewFormName(form.name) }</h2>
+                <h2 className='text-2xl font-bold flex-grow text-right text-gray-800'>{ getHebrewFormName(form.name) }</h2>
             </div>            
             <div ref={ formRef } className='form-body my-2'>                   
                 
@@ -363,13 +358,7 @@ const Form = ({ form, close }: Props) => {
             {  
                 form.images ? <div className='py-2 text-right text-green-500'>{appStrings.attchmentsExists}</div> 
                             : <AttachFile ref={attachmentsRef} updateFiles={updateImages}/> 
-            }                    
-            
-            {/* Alpha version => Testing */}
-            {/* <div ref={ sendRef } className='staging-send flex mt-5'>
-                <label className='mr-2'>Send to me</label>
-                <input type="checkbox" name="receiver" defaultChecked={false} id=""/>
-            </div> */}
+            }                                
             
         </div>
 

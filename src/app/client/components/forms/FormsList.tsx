@@ -8,7 +8,7 @@ import Modal from '../ui/Modal';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { PdfForm } from '@/app/utils/types/formTypes';
 import { useDelete, usePatch } from '../../hooks/useQuery';
-import { getHebrewString, isStorageForm } from '@/app/utils/helper';
+import { getHebrewFormName, getHebrewString, isStorageForm } from '@/app/utils/helper';
 import { Spinner } from '../ui/Spinner';
 import { reverseDateDirection } from '../../helpers/formHelper';
 import { appStrings } from '@/app/utils/AppContent';
@@ -125,7 +125,7 @@ const FormsList = ({ forms, openForm, title, addFilter, display }: Props) => {
         setShow(!show)
     }
     
-    console.log('FormList=>',forms)
+    //console.log('FormList=>',forms)
 
     return (
         <>
@@ -158,7 +158,7 @@ const FormsList = ({ forms, openForm, title, addFilter, display }: Props) => {
                             key={form.name + form?.id}
                             onClick={() => handleClick(form)}
                         >
-                            <span>{getHebrewString(form.name)}</span>
+                            <span>{getHebrewFormName(form.name)}</span>
                             <span>{form.formFields.find((item) => item.name === "customer")?.value || ""}</span>                    
                             <span>{form?.userName}</span>
                             <span>{typeof form?.created_at === "string" ? reverseDateDirection(form.created_at.slice(0, 10)) : ""}</span>

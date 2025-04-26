@@ -163,7 +163,7 @@ export const sendForm = async (payload: FormPayload) => {
             return { success: false, message: "Missing attachments to send!" };
         }
 
-        const email = prepareEmail(receiver, payload.form.formFields, pdfDocs);
+        const email = prepareEmail(receiver, payload.form, pdfDocs);
         
         return await sendEmail(email);            
         

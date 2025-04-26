@@ -8,15 +8,28 @@ import { useTechnician } from '../../hooks/useTechnician';
 import { useManufacture } from '../../hooks/useManufacture';
 import { Technicians } from '@/app/utils/types/entities';
 import { isStorageForm } from '@/app/utils/helper';
+import { newFormFieldsMap, isDynamicForm } from '../../helpers/formHelper';
 
 
-const generateFormBlocks = (formFields: PdfField[]) => {    
-    return Object.entries(formFieldMap).map(([key, value]) => {        
+const generateFormBlocks = (staticFields: PdfField[], dynamicFields: PdfField[]) => {   
+    
+    const generatedBlocks = Object.entries(formFieldMap).map(([key, value]) => {                
         return {            
             name: key,
-            fields: formFields.filter((field: any) => (value.includes(field.name) && field.require))
+            fields: staticFields.filter((field: any) => (value.includes(field.name) && field.require))
         };
     }).filter(block => block.fields.length);
+
+    //todo: we need an num increment in tbl_panel_num field
+    if (dynamicFields.length) {        
+        generatedBlocks.push({
+            name: 'bizpermittbl1',
+            fields: dynamicFields
+        })
+        
+    }
+
+    return generatedBlocks
 };
 
 
@@ -32,19 +45,22 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
     const { manufactures } = useManufacture();
     
     const [ provider, setProvider ] = useState<string | boolean>(false);
-    const [ showStorage, setShowStorage ] = useState(false);
+    const [ showStorage, setShowStorage ] = useState(false);        
+    const [ dynamicFields, setdynamicFields ] = useState<PdfField[]>([]);
+    
+    const dynamicBlocksSize = useRef<number>(1);
 
     const formFieldsRef = useRef<HTMLDivElement | null>(null);     
-    const formBlocks = useMemo(() => generateFormBlocks(form.formFields), [form.formFields]);
+    const formBlocks = useMemo(() => generateFormBlocks(form.formFields, dynamicFields), [form.formFields]);
     
-    //console.log('FormFields.render=>')
+    //console.log('FormFields.render=>form.formFields',form.formFields)
 
     useEffect(() => {
         // check if storage form 
         if (form.name === 'inspection' && isStorageForm(form.formFields)) {            
             toggleStorageFields();              
         }
-    }, [JSON.stringify(form.formFields)]);
+    }, [form.formFields]);
     
     const toggleStorageFields = () => {
         setShowStorage(prev => !prev);
@@ -70,6 +86,16 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
             ])            
         }                                 
     } 
+
+    const addNewFields = () => {
+        //todo: add new fields in seperate block
+        const newFields = newFormFieldsMap['bizPermit']?.(dynamicBlocksSize.current, form.name) || [];        
+        form.formFields = [...form.formFields, ...newFields];
+        dynamicBlocksSize.current++;
+        setdynamicFields((prev) => [...prev, ...newFields]);
+        //        
+    }
+
 
     return (
         <>
@@ -105,6 +131,11 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
                     </div>
                 );
             })}
+
+            {isDynamicForm(form.name) && <button type="button" onClick={ addNewFields } className="mt-4 text-blue-500 hover:text-blue-700">
+                Add New Field
+            </button>}
+
         </div>        
         </>    
     )

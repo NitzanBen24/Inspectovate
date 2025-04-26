@@ -1,8 +1,6 @@
-import { formFieldMap } from "@/app/utils/AppContent";
+import { dropDownOptionsMap, formFieldMap } from "@/app/utils/AppContent";
 import { elementsWithValueExist } from "@/app/utils/helper";
-
 import { FieldsObject, PdfField } from "@/app/utils/types/formTypes";
-
 
 
 // Utility function to get today's date in the format yyyy month (Hebrew) dd
@@ -15,7 +13,9 @@ export const formatHebrewDate = () => {
     const mmHText = monthsHebrew[today.getMonth()];
     const dd = today.getDate().toString();
     
-    return yy + "  " + mmHText + "  " + dd;
+    const hebrewDate = yy + "  " + mmHText + "  " + dd;
+
+    return hebrewDate
 };
 
 // Calculate power value => move to server
@@ -66,6 +66,23 @@ export const addInspectionFields = (formFields: PdfField[], formRef: React.Mutab
     }
 
     return addFields;
+}
+
+export const isDynamicForm = (formName: string) => {    
+    return (formName === 'bizpermit') ? true : false;
+}
+
+export const newFormFieldsMap = {
+    bizPermit: (index: number, formName: string) => {
+        return formFieldMap.bizpermittbl.map(fieldName => {
+            return {
+                name: fieldName.endsWith('-ls') ? fieldName.replace('-ls', index+'-ls') : fieldName + index,
+                type: fieldName.endsWith('-ls') ? 'DropDown' : 'PDFTextField',
+                require: true,
+                options: dropDownOptionsMap[formName][fieldName]
+            }
+        });        
+    }
 }
 
 // todo: can be used also not in Form component => should be move to a general folder

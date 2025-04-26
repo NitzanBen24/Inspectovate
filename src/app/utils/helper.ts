@@ -19,7 +19,14 @@ export const elementsWithValueExist = (array: PdfField[], fieldNames: string[]):
 };
 
 export const getHebrewFormName = (fileName: string) : string => {
-    const names: any = {inspection: 'בדיקה', elevator: 'מעליות', charge: 'טעינה'};
+    const names: any = {
+		inspection: 'בדיקה', 
+		elevator: 'מעליות', 
+		charge: 'עמדת טעינה', 
+		schindler: 'שינדלר מעליות',
+		bizpermit: 'רישוי עסקים',
+		inspectest: 'סולארי דוגמא'
+	};
 
     return names[fileName] || '';
 }
@@ -59,6 +66,7 @@ export const getHebrewString = (str: string): string => {
         evolt: 'evolt',
         inspectest: 'דוגמא בדיקה',
         schindler: 'שינדלר',
+        bizpermit: 'רישוי עסקים'
       }
   
     return options[str];
