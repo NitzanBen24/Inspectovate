@@ -60,9 +60,9 @@ export const pdfFormFields: any = {
     'PDFTextField': (fields: PDFField[]) => {      
         console.log('pdfFormFields.PDFTextField!!',fields)          
         return fields.map((field) => {            
+            console.log('constructor!!',field.constructor.name)
             const fieldName = field.getName();
             const fieldType = (fieldName.endsWith('-ls')) ? 'DropDown' : field.constructor.name;
-
             return {
                 name: fieldName,
                 type: fieldType,
