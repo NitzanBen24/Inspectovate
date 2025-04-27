@@ -1,4 +1,4 @@
-import { PDFDocument as PDFLibDocument, PDFPage, PDFFont, TextAlignment, PDFImage, PDFForm, PDFTextField } from 'pdf-lib';
+import { PDFDocument as PDFLibDocument, PDFPage, PDFFont, TextAlignment, PDFImage, PDFForm, PDFTextField, PDFCheckBox } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import fontkit from '@pdf-lib/fontkit';
@@ -219,15 +219,15 @@ const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, e
     const fields = pdfForm.getFields();
     
     fields
-        .filter(field => field.constructor.name === 'PDFTextField')
+        .filter(field => field instanceof PDFTextField)
         .forEach((field) => {            
-            const fieldName = field.getName();
-            const fieldType = field.constructor.name;
+            const fieldName = field.getName();            
+            const fieldType = 'PDFTextField';
             pdfFillerFields[fieldType]?.({fieldName, pdfForm, form, hfont, efont});
         })
     
     // CheckBox fields      
-    const checkBoxes = fields.filter(field => field.constructor.name === 'PDFCheckBox').map(item => item.getName());        
+    const checkBoxes = fields.filter(field => field instanceof PDFCheckBox).map(item => item.getName());        
     if (checkBoxes.length) {
         pdfFillerFields['PDFCheckBox']?.(pdfForm, form.formFields.filter(field => field.name.startsWith('check')));                
     }
@@ -238,12 +238,11 @@ const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
 
     const pdfFields = pdfForm.getFields();
     // CheckBox fields 
-    const checkFields: PdfField[] = pdfFormFields['PDFCheckBox']?.(pdfFields.filter(field => field.constructor.name === 'PDFCheckBox'), formName);    
+    const checkFields: PdfField[] = pdfFormFields['PDFCheckBox']?.(pdfFields.filter(field => field instanceof PDFCheckBox), formName);    
     
     // tbl Fields
     const tblFields: PdfField[] = pdfFormFields['tblField']?.(pdfFields.filter(field => (field.getName().startsWith('tbl_') && field.isRequired())), formName);
     
-    console.log('pdfFields!!',pdfFields.filter(field => (field instanceof PDFTextField && !(field.getName().startsWith('tbl_')))))
     // Text fields
     const fields: PdfField[] = pdfFormFields['PDFTextField'](pdfFields.filter(field => (field instanceof PDFTextField && !(field.getName().startsWith('tbl_')))));
 
@@ -269,11 +268,9 @@ export const getPdfForms = async (fileNames: string[]): Promise<{ forms: PdfForm
                 try {
                     // Load and parse PDF document                                                    
                     const pdfDoc = await _loafPDF(filePath);
-                    const pdfForm = pdfDoc.getForm();                  
-                    console.log('check.filePath!!',filePath)
+                    const pdfForm = pdfDoc.getForm();                                      
                     if (pdfForm) {                        
-                        form.formFields = _getFormFields(pdfForm, form.name);
-                        console.log('formfields!!',form.formFields)
+                        form.formFields = _getFormFields(pdfForm, form.name);                    
                     }
 
                     form.formFields.push(..._extraFields(form.name));
