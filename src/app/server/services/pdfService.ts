@@ -241,10 +241,10 @@ const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
     const checkFields: PdfField[] = pdfFormFields['PDFCheckBox'](pdfFields.filter(field => field.constructor.name === 'PDFCheckBox'), formName);    
     
     // tbl Fields
-    const tblFields: PdfField[] = pdfFormFields['tblField'](pdfFields.filter(field => (field.getName().startsWith('tbl_') && field.isRequired())), formName);
+    const tblFields: PdfField[] = pdfFormFields['tblField']?.(pdfFields.filter(field => (field.getName().startsWith('tbl_') && field.isRequired())), formName);
 
     // Text fields
-    const fields: PdfField[] = pdfFormFields['PDFTextField'](pdfFields.filter(field => (field.constructor.name === 'PDFTextField' && !(field.getName().startsWith('tbl_')))));
+    const fields: PdfField[] = pdfFormFields['PDFTextField']?.(pdfFields.filter(field => (field.constructor.name === 'PDFTextField' && !(field.getName().startsWith('tbl_')))));
 
     // Combine both arrays (regular fields and checkbox fields)    
     return [...fields, ...checkFields, ...tblFields];
@@ -269,7 +269,7 @@ export const getPdfForms = async (fileNames: string[]): Promise<{ forms: PdfForm
                     // Load and parse PDF document                                                    
                     const pdfDoc = await _loafPDF(filePath);
                     const pdfForm = pdfDoc.getForm();                  
-                    console.log('chek.filePath!!',filePath)
+                    console.log('check.filePath!!',filePath)
                     if (pdfForm) {                        
                         form.formFields = _getFormFields(pdfForm, form.name);
                         console.log('formfields!!',form.formFields)
