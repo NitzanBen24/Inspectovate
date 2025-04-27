@@ -1,7 +1,7 @@
 
 import { dropDownOptionsMap } from "@/app/utils/AppContent";
 import { PdfField, PdfForm } from "@/app/utils/types/formTypes"
-import { PDFCheckBox, PDFField, PDFFont, PDFForm, TextAlignment } from "pdf-lib";
+import { PDFCheckBox, PDFField, PDFFont, PDFForm, PDFTextField, TextAlignment } from "pdf-lib";
 import { options } from "sanitize-html";
 
 const _containsHebrew = (text: string) => /[\u0590-\u05FF]/.test(text);
@@ -60,9 +60,9 @@ export const pdfFormFields: any = {
     'PDFTextField': (fields: PDFField[]) => {      
         console.log('pdfFormFields.PDFTextField!!',fields)          
         return fields.map((field) => {            
-            console.log('constructor!!',field.constructor.name)
+            //console.log('constructor!!', field instanceof PDFTextField )
             const fieldName = field.getName();
-            const fieldType = (fieldName.endsWith('-ls')) ? 'DropDown' : field.constructor.name;
+            const fieldType = (fieldName.endsWith('-ls')) ? 'DropDown' : 'PDFTextField';
             return {
                 name: fieldName,
                 type: fieldType,
@@ -98,7 +98,7 @@ export const pdfFormFields: any = {
     'tblField': (fields: PDFField[], formName: string) => {        
         return fields.map((field) => {            
             const fieldName = field.getName();
-            const fieldType = (fieldName.endsWith('-ls')) ? 'DropDown' : field.constructor.name;            
+            const fieldType = (fieldName.endsWith('-ls')) ? 'DropDown' : 'PDFTextField';            
             return {
                 name: fieldName,
                 type: fieldType,

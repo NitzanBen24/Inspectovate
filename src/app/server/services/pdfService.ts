@@ -1,4 +1,4 @@
-import { PDFDocument as PDFLibDocument, PDFPage, PDFFont, TextAlignment, PDFImage, PDFForm } from 'pdf-lib';
+import { PDFDocument as PDFLibDocument, PDFPage, PDFFont, TextAlignment, PDFImage, PDFForm, PDFTextField } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import fontkit from '@pdf-lib/fontkit';
@@ -235,17 +235,17 @@ const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, e
 };
 
 const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
-    
+
     const pdfFields = pdfForm.getFields();
-    console.log('pdfFields!!',pdfFields)
     // CheckBox fields 
     const checkFields: PdfField[] = pdfFormFields['PDFCheckBox']?.(pdfFields.filter(field => field.constructor.name === 'PDFCheckBox'), formName);    
     
     // tbl Fields
     const tblFields: PdfField[] = pdfFormFields['tblField']?.(pdfFields.filter(field => (field.getName().startsWith('tbl_') && field.isRequired())), formName);
-
+    
+    console.log('pdfFields!!',pdfFields.filter(field => (field instanceof PDFTextField && !(field.getName().startsWith('tbl_')))))
     // Text fields
-    const fields: PdfField[] = pdfFormFields['PDFTextField'](pdfFields.filter(field => (field.constructor.name === 'PDFTextField' && !(field.getName().startsWith('tbl_')))));
+    const fields: PdfField[] = pdfFormFields['PDFTextField'](pdfFields.filter(field => (field instanceof PDFTextField && !(field.getName().startsWith('tbl_')))));
 
     // Combine both arrays (regular fields and checkbox fields)    
     return [...fields, ...checkFields, ...tblFields];
