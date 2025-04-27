@@ -68,7 +68,6 @@ export const formFieldMap = {
     //bizpermit
     bizpermit: ['filenum', 'bizname', 'biztype', 'regnum',  'city', 'street', 'addressnum', 'date', 'checkswitch'],
     bizpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
-//'tbl_panel_pos1-ls', 'tbl_panel_num1', 'tbl_panel_ampsize1', 'tbl_panel_cut1-ls', 'tbl_panel_vis1-ls', 'tbl_panel_down1-ls'
     end: ['comments', 'message'],
     signature: ['signature']
     

@@ -237,7 +237,7 @@ const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, e
 const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
     
     const pdfFields = pdfForm.getFields();
-    // CheckBox fields
+    // CheckBox fields 
     const checkFields: PdfField[] = pdfFormFields['PDFCheckBox']?.(pdfFields.filter(field => field.constructor.name === 'PDFCheckBox'), formName);    
     
     // tbl Fields
@@ -269,10 +269,10 @@ export const getPdfForms = async (fileNames: string[]): Promise<{ forms: PdfForm
                     // Load and parse PDF document                                                    
                     const pdfDoc = await _loafPDF(filePath);
                     const pdfForm = pdfDoc.getForm();                  
-                    
+                    console.log('chek.filePath!!',filePath)
                     if (pdfForm) {                        
                         form.formFields = _getFormFields(pdfForm, form.name);
-                        //console.log('formfields!!',form.formFields)
+                        console.log('formfields!!',form.formFields)
                     }
 
                     form.formFields.push(..._extraFields(form.name));

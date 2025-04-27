@@ -104,6 +104,6 @@ export const pdfFormFields: any = {
                 require: field.isRequired(),                
                 options: dropDownOptionsMap[formName][fieldName]                
             };
-        });
+        }); 
     }
 }
