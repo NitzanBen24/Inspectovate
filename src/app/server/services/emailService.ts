@@ -20,8 +20,8 @@ export const prepareEmail = (receiver: string, form: PdfForm, attachments: any):
     const options: EmailInfo = {};  
     const emailFields = ['customer', 'provider', 'message'];
     const emailOption: Record<string, string> = {
-        'customer': 'subject',
-        'provider': 'filename',
+        'provider': 'subject',
+        'customer': 'filename',
     };
 
     form.formFields.forEach((item) => {
