@@ -152,14 +152,15 @@ const FormsList = ({ forms, openForm, title, addFilter, display }: Props) => {
                     const isStorage = isStorageForm(form.formFields); // Check once per form
                     return (
                         <li
-                            className={`form-list-item py-1 grid grid-cols-5 gap-3 place-items-center border-gray-400 border mb-1 rounded-md ${
+                            className={`form-list-item py-1 grid grid-cols-6 gap-3 place-items-center border-gray-400 border mb-1 rounded-md ${
                             isStorage ? "bg-cyan-50" : "bg-white"
                             }`}
                             key={form.name + form?.id}
                             onClick={() => handleClick(form)}
                         >
                             <span>{getHebrewFormName(form.name)}</span>
-                            <span>{form.formFields.find((item) => item.name === "customer")?.value || ""}</span>                    
+                            <span>{form.formFields.find((item) => item.name === "customer")?.value || ""}</span>
+                            <span>{form.formFields.find((item) => item.name === "provider")?.value || ""}</span>
                             <span>{form?.userName}</span>
                             <span>{typeof form?.created_at === "string" ? reverseDateDirection(form.created_at.slice(0, 10)) : ""}</span>
                             <div>                  
@@ -177,11 +178,12 @@ const FormsList = ({ forms, openForm, title, addFilter, display }: Props) => {
                 })}
                 {show && addFilter 
                       && <li
-                            className='form-list-item grid grid-cols-5 gap-3 place-items-center mb-2'
+                            className='form-list-item grid grid-cols-6 gap-3 place-items-center mb-2'
                             key={getHebrewString(title)}
                             >
                             <span>שם טופס:</span>
-                            <span>לקוח:</span>                
+                            <span>לקוח:</span>
+                            <span>ספק:</span>           
                             <span>בודק:</span>
                             <span>תאריך:</span>
                         </li>}
