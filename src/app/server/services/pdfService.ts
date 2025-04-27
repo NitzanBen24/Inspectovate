@@ -237,7 +237,6 @@ const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, e
 const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
     
     const pdfFields = pdfForm.getFields();
-    console.log('pdfFields!!',pdfFields)
     // CheckBox fields 
     const checkFields: PdfField[] = pdfFormFields['PDFCheckBox'](pdfFields.filter(field => field.constructor.name === 'PDFCheckBox'), formName);    
     
@@ -246,7 +245,7 @@ const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
 
     // Text fields
     const fields: PdfField[] = pdfFormFields['PDFTextField']?.(pdfFields.filter(field => (field.constructor.name === 'PDFTextField' && !(field.getName().startsWith('tbl_')))));
-console.log('textFields!!',fields)
+
     // Combine both arrays (regular fields and checkbox fields)    
     return [...fields, ...checkFields, ...tblFields];
 };
