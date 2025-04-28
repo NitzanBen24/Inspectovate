@@ -50,9 +50,9 @@ export const pdfFillerFields: any = {
             textField.updateAppearances(efont);
             
             // todo refactor, remove this from here
-            // if (fieldName === 'filenum' || fieldName === 'regnum') {
-            //     textField.updateAppearances(bold);
-            // }
+            if (fieldName === 'filenum' || fieldName === 'regnum') {
+                textField.updateAppearances(bold);
+            }
         }
     },
     'PDFCheckBox': (pdfForm: PDFForm, formFields: PdfField[]) => {              
