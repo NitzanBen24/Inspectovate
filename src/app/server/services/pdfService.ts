@@ -246,7 +246,7 @@ const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
     // Text fields
     const fields: PdfField[] = pdfFormFields['PDFTextField']?.(pdfFields.filter(field => (field instanceof PDFTextField && !(field.getName().startsWith('tbl_')))));
 
-    // Combine both arrays (regular fields and checkbox fields)    
+    // Combine both arrays (regular fields and checkbox fields)     
     return [...fields, ...checkFields, ...tblFields];
 };
 

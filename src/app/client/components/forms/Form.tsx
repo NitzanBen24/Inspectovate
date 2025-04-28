@@ -343,7 +343,7 @@ const Form = ({ form, close }: Props) => {
                 </button>
             </div>
 
-            {/* {   
+            {/* {    
                 <div onClick={() => setShowSignature(!showSignature)} className='add-sign-tab flex justify-end'>
                     <span className='flex my-2'>                        
                         <ChevronDownIcon className="size-6"/>

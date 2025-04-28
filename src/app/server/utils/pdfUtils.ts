@@ -17,7 +17,7 @@ export const reverseEnglishAndNumbers = (text: string): string  => {
 
 //todo: Review new field proccess, test and optimize 
 export const pdfFillerFields: any = {
-    
+
     'PDFTextField': (fieldName: string, pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, efont: PDFFont, bold: PDFFont) => {
         
         const textField = pdfForm.getTextField(fieldName);

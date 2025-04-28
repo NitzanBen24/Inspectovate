@@ -119,7 +119,7 @@ export const fieldsNameMap: any = {
     power: 'הספק',
     maxcurrent: 'זרם מרבי',
     breakersize: 'גודל המספק',
-    //bizpermit
+    //bizpermit 
     filenum: 'מספר תיק',
     bizname: 'שם העסק',
     regnum: 'ח.פ',
