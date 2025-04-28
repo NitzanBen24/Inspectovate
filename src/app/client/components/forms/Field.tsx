@@ -39,7 +39,7 @@ const Field = ({ formName, field, registerRef, technicians, manufactures, provid
         return fieldsNameMap[rawKey] ?? fieldsNameMap[rawKey.slice(0, -1)];
     }, [field]) ;
 
-    
+    const inputType = field.name === 'setdate' ? 'date' : 'text';
 
     const FieldType: Record<string, JSX.Element> = {
         DropDown: (
@@ -62,10 +62,8 @@ const Field = ({ formName, field, registerRef, technicians, manufactures, provid
         ),
         TextField: (
             <input 
-                className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" 
-                //todo refactor move setdate check to somewhere else 
-                //type={field.name === "setdate" ? "date" : "text"} 
-                type='text'
+                className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm"                 
+                type={inputType}
                 name={field.name}
                 required 
             />
