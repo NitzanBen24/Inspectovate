@@ -63,7 +63,8 @@ const Field = ({ formName, field, registerRef, technicians, manufactures, provid
         TextField: (
             <input 
                 className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" 
-                type="text" 
+                //todo refactor move setdate check to somewhere else
+                type={field.name === "setdate" ? "date" : "text"} 
                 name={field.name}
                 required 
             />

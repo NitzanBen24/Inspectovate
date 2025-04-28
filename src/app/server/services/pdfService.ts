@@ -209,7 +209,7 @@ function _wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: numb
  * hfont = Hebrew
  * efont = English
  */
-const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, efont: PDFFont) => {
+const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, efont: PDFFont, bold: PDFFont) => {
     
     if (form.company_id === 4 && form.name === 'inspection') {
         form.formFields = _addInspectionRep(form)
@@ -223,7 +223,7 @@ const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, e
         .forEach((field) => {            
             const fieldName = field.getName();            
             const fieldType = 'PDFTextField';
-            pdfFillerFields[fieldType]?.({fieldName, pdfForm, form, hfont, efont});
+            pdfFillerFields[fieldType]?.(fieldName, pdfForm, form, hfont, efont, bold);
         })
     
     // CheckBox fields      
@@ -244,7 +244,7 @@ const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
     const tblFields: PdfField[] = pdfFormFields['tblField']?.(pdfFields.filter(field => (field.getName().startsWith('tbl_') && field.isRequired())), formName);
     
     // Text fields
-    const fields: PdfField[] = pdfFormFields['PDFTextField'](pdfFields.filter(field => (field instanceof PDFTextField && !(field.getName().startsWith('tbl_')))));
+    const fields: PdfField[] = pdfFormFields['PDFTextField']?.(pdfFields.filter(field => (field instanceof PDFTextField && !(field.getName().startsWith('tbl_')))));
 
     // Combine both arrays (regular fields and checkbox fields)    
     return [...fields, ...checkFields, ...tblFields];
@@ -322,7 +322,7 @@ export const generateDocumnet = async (form: PdfForm): Promise<Uint8Array | []> 
         // Fill form fields in the main PDF with pdf-lib    
         const pdfForm = pdfDoc.getForm();
     
-        _fillPdfFields(pdfForm, form, hebrewFont, openSunsFont);
+        _fillPdfFields(pdfForm, form, hebrewFont, openSunsFont, boldFont);
     
         // only for ispections form
         if (form.name === 'inspection') {    

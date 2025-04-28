@@ -133,7 +133,7 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
             })}
 
             {isDynamicForm(form.name) && <button type="button" onClick={ addNewFields } className="mt-4 text-blue-500 hover:text-blue-700">
-                Add New Field
+                הוסף לוח חשמל
             </button>}
 
         </div>        

@@ -17,15 +17,15 @@ export const reverseEnglishAndNumbers = (text: string): string  => {
 
 //todo: Review new field proccess, test and optimize 
 export const pdfFillerFields: any = {
-
-    'PDFTextField': (data: {fieldName: string, pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, efont: PDFFont}) => {
+    
+    'PDFTextField': (fieldName: string, pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, efont: PDFFont, bold: PDFFont) => {
         
-        const textField = data.pdfForm.getTextField(data.fieldName);
+        const textField = pdfForm.getTextField(fieldName);
                     
         if (!textField) return; // Ensure field exists before setting values
 
 
-        let formField = data.form.formFields.find((item: PdfField) => item.name === data.fieldName);
+        let formField = form.formFields.find((item: PdfField) => item.name === fieldName);
 
         if (formField === undefined || formField.value?.length === 0) {
             return;
@@ -44,10 +44,14 @@ export const pdfFillerFields: any = {
 
         if (hasHebrew) {
             textField.setAlignment(TextAlignment.Right);
-            textField.updateAppearances(data.hfont);
+            textField.updateAppearances(hfont);
         } else {
             textField.setAlignment(TextAlignment.Left);
-            textField.updateAppearances(data.efont);
+            textField.updateAppearances(efont);
+            // todo refactor, remove this from here
+            if (fieldName === 'filenum' || fieldName === 'regnum') {
+                textField.updateAppearances(bold);
+            }
         }
     },
     'PDFCheckBox': (pdfForm: PDFForm, formFields: PdfField[]) => {              

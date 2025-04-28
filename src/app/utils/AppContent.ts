@@ -66,7 +66,7 @@ export const formFieldMap = {
     //charge
     charge: ['station', 'manufacture', 'model', 'power',  'maxcurrent', 'breakersize'],
     //bizpermit
-    bizpermit: ['filenum', 'bizname', 'biztype', 'regnum',  'city', 'street', 'addressnum', 'date', 'checkswitch'],
+    bizpermit: ['filenum', 'bizname', 'biztype', 'regnum',  'city', 'street', 'addressnum', 'setdate', 'checkswitch'],
     bizpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
     end: ['comments', 'message'],
     signature: ['signature']
@@ -128,6 +128,7 @@ export const fieldsNameMap: any = {
     street: 'רחוב',
     addressnum: 'מס׳',
     checkswitch: 'קיום מפסק',
+    setdate: 'תאריך ביקור',
     tbl_panel_num: 'מספר הלוח',
     tbl_panel_pos: 'מיקום הלוח',    
     tbl_panel_ampsize: 'גודל האמפר',
