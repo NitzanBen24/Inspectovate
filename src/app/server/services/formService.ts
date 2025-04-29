@@ -1,5 +1,5 @@
 import { FormPayload, PdfForm } from "@/app/utils/types/formTypes";
-import { addNewForm, getActiveForms, getActiveFormsByUserId, getSearchForms, updateForm } from "../lib/db/forms";
+import { addNewForm, getActiveForms, getActiveFormsByUserId, getSearchForms, getSupervisorActiveForms, updateForm } from "../lib/db/forms";
 import { appStrings } from "@/app/utils/AppContent";
 import { getPdfForms, generateDocumnet } from "./pdfService";
 import { downloadImages } from "./storageService";
@@ -113,15 +113,23 @@ const _saveData = async (payload: FormPayload, fields:formModel) => {
     }
 }
 
+//todo revmoe to a type file
+type FetchFunction = (userId: number, tblShort: string) => Promise<any>;
 
-export const getUserActiveForms = async (user: User, tblShort: string ): Promise<PdfForm[]> => {
+export const getUserActiveForms = async (user: User, tblShort: string): Promise<PdfForm[]> => {
     
-    const records = (user.role === 'admin') 
-        ? await getActiveForms(tblShort) 
-        : await getActiveFormsByUserId(user.id, tblShort);
+    const roleFetchMap: Record<string, FetchFunction> = {
+        admin: async (_, tbl) => getActiveForms(tbl),
+        supervisor: async (id, tbl) => getSupervisorActiveForms(id, tbl),
+        default: async (id, tbl) => getActiveFormsByUserId(id, tbl),
+    };
 
+    const fetchFn = roleFetchMap[user.role] || roleFetchMap.default;
+    const records = await fetchFn(user.id, tblShort);
+    
     return mapFieldsToForms(records);
-}
+};
+
 
 export const saveForm = async (payload: FormPayload): Promise<any> => {
 

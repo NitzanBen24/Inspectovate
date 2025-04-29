@@ -48,6 +48,23 @@ export const getActiveFormsByUserId = async (id: number, tbl: string): Promise<f
     return data;
 }
 
+export const getSupervisorActiveForms = async (id: number, tbl: string): Promise<formModel[]> => {
+    
+    const { data, error } = await supabase
+        .from(`${tbl}${TABLE_NAME}`)
+        .select('*')        
+        .neq('name','inspection')
+        .neq('status', 'archive')
+        .order("created_at", { ascending: false }); // Ensure latest data
+
+    if (error) {
+        console.error(`Error fetching forms for user ID:: ${error.message}`);
+        throw error;
+    }
+    
+    return data;
+}
+
 export const getFormById = async (id: number, tbl: string): Promise<formModel[]> => {
     
     const { data, error } = await supabase

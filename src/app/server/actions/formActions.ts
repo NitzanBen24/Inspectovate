@@ -68,13 +68,9 @@ export async function searchForms(payload: any): Promise<{ success?: boolean, me
             return { message: "Missing search fields", error: "Missing fields" };
         }
           
-        const queryFields = getQueryFields(query);
-        
-        if (query.name) {            
-            queryFields.name = getEnglishFormName(query.name);           
-        } else {
-            queryFields.name = 'inspection';
-        }
+        const queryFields = getQueryFields(query);                
+        //todo call getEnglishFormName from getQueryFields
+        queryFields.name = getEnglishFormName(query.name);           
         
         const { short_name: tbl } = await fetchCompanyForms(payload.company_id);
 
