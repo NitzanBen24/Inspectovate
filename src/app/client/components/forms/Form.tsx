@@ -320,7 +320,7 @@ const Form = ({ form, close }: Props) => {
                     consider move this to seperate file/repo
                 */}
                 {/** change field name stauts to different name, the meaning is if inspection passed or not */}
-                {form.name === 'inspection' && <div className='flex status-wrap mt-3'>
+                {/* {form.name === 'inspection' && <div className='flex status-wrap mt-3'>
                     <label className='block text-sm min-w-20 content-center font-medium text-black'>תוצאה:</label>
                     <div className='flex items-center'>
                         <label className='block text-sm content-center font-medium text-black' htmlFor="status-complete">עבר:</label>
@@ -328,7 +328,7 @@ const Form = ({ form, close }: Props) => {
                         <label className='block text-sm content-center font-medium text-black' htmlFor="status-complete">לא עבר:</label>
                         <input className='mx-2' type="radio" name='status' value="incomplete" id='status-incomplete' />
                     </div>                    
-                </div>}
+                </div>} */}
 
             </div>
 

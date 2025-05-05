@@ -127,20 +127,20 @@ const _addImagesToDoc = async (pdf: PDFLibDocument, lastPage: PDFPage, images: P
     }
 }
 
-const _markInspectionResult = (pdfForm: PDFForm, pdfDoc: PDFLibDocument, fields: PdfField[], bold: PDFFont) => {
-    /** todo: in client change status name */
-    let statusField = fields.find((item: PdfField) => item.name === 'status');
-    if (statusField?.value) {      
-        if (statusField.value == 'complete') {
-            pdfForm.getTextField('approve').updateAppearances(bold);
-        } else if ((statusField.value == 'incomplete')) {
-            pdfForm.getTextField('decline').updateAppearances(bold);
-            if (pdfDoc.getPages().length - 2) {
-                pdfDoc.removePage(pdfDoc.getPages().length - 2)
-            }        
-        }
-    }
-}
+// const _markInspectionResult = (pdfForm: PDFForm, pdfDoc: PDFLibDocument, fields: PdfField[], bold: PDFFont) => {
+//     /** todo: in client change status name */
+//     let statusField = fields.find((item: PdfField) => item.name === 'status');
+//     if (statusField?.value) {      
+//         if (statusField.value == 'complete') {
+//             pdfForm.getTextField('approve').updateAppearances(bold);
+//         } else if ((statusField.value == 'incomplete')) {
+//             pdfForm.getTextField('decline').updateAppearances(bold);
+//             if (pdfDoc.getPages().length - 2) {
+//                 pdfDoc.removePage(pdfDoc.getPages().length - 2)
+//             }        
+//         }
+//     }
+// }
 
 function _addComments(doc: PDFLibDocument, fields: PdfField[], hebrewFont: PDFFont) {
 
@@ -325,9 +325,9 @@ export const generateDocumnet = async (form: PdfForm): Promise<Uint8Array | []> 
         _fillPdfFields(pdfForm, form, hebrewFont, openSunsFont, boldFont);
     
         // only for ispections form
-        if (form.name === 'inspection') {    
-            _markInspectionResult(pdfForm, pdfDoc, form.formFields, boldFont)        
-        }
+        // if (form.name === 'inspection') {    
+        //     _markInspectionResult(pdfForm, pdfDoc, form.formFields, boldFont)        
+        // }
 
         //todo: move this to a seperate function
         if (form.name === 'schindler') {
