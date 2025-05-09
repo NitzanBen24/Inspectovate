@@ -58,7 +58,7 @@ export const formFieldMap = {
     convertor: ['cunits', 'cpower', 'convertor-ls', 'cmodel'],
     panel: ['punits', 'ppower', 'panel-ls', 'pmodel'],
     techs: ['electrician-ls', 'elicense', 'ephone', 'eemail','planner-ls', 'plicense', 'pphone', 'pemail'],
-    data: ['voltl', 'voltn', 'omega', 'pm', 'rcurrent', 'mcurrent', 'check'],
+    data: ['voltl', 'voltn', 'omega', 'pm', 'rcurrent', 'mcurrent'],//, 'check'
     //storage
     storage: ['batteries','capacity', 'bmanufacture'],
     //elevator
@@ -95,7 +95,7 @@ export const fieldsNameMap: any = {
     voltn: 'מתח פאזי',
     rcurrent: 'פחת',
     mcurrent: 'זרם זליגה',
-    check: 'תקין',
+    // check: 'תקין',
     omega: 'לולאת תקלה',
     pm: 'שיטת הגנה',
     facillity: 'מתקן',
@@ -155,7 +155,7 @@ export const dropDownOptionsMap: Record<string, typeof bizpermitOptions> = {
 	'bizpermit': bizpermitOptions
 }
 
-export const checkBoxesEndName: any = {
+export const checkBoxesValue: any = {
 	'bizpermit': {
 		'checkswitch': {
 			'חשמל חירום תקין': 'first', 

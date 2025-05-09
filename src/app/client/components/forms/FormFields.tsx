@@ -1,37 +1,34 @@
 'use client';
 import { formFieldMap } from '@/app/utils/AppContent';
-import { FieldsObject, PdfField, PdfForm } from '@/app/utils/types/formTypes'
+import { FieldsObject, FormBlocks, PdfField, PdfForm } from '@/app/utils/types/formTypes'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Field from './Field';
 import { SearchableDropdownHandle } from './SearchableDropdown';
 import { useTechnician } from '../../hooks/useTechnician';
-import { useManufacture } from '../../hooks/useManufacture';
-import { Technicians } from '@/app/utils/types/entities';
 import { isStorageForm } from '@/app/utils/helper';
-import { newFormFieldsMap, isDynamicForm } from '../../helpers/formHelper';
+import { getDynamicFields, isDynamicForm } from '../../helpers/formHelper';
 
 
-const generateFormBlocks = (staticFields: PdfField[], dynamicFields: PdfField[]) => {   
-    
-    const generatedBlocks = Object.entries(formFieldMap).map(([key, value]) => {                
-        return {            
-            name: key,
-            fields: staticFields.filter((field: any) => (value.includes(field.name) && field.require))
-        };
-    }).filter(block => block.fields.length);
-
-    //todo: we need an num increment in tbl_panel_num field
-    if (dynamicFields.length) {        
-        generatedBlocks.push({
-            name: 'bizpermittbl1',
-            fields: dynamicFields
-        })
+const generateFormBlocks = (staticFields: PdfField[], blocks: FormBlocks[], blockSize: number) => {
+  
+    const generatedBlocks = Object.entries(formFieldMap).map(([blockName, fieldNames]) => {
         
+        const fields = staticFields.filter((field) => field.require && fieldNames.includes(field.name));  
+        return fields.length ? { name: blockName, fields } : null;
+
+    }).filter(Boolean) as { name: string; fields: PdfField[] }[];
+
+    // add dynamic fields
+    if (blockSize) {
+        return [...generatedBlocks, ...blocks]
     }
 
-    return generatedBlocks
+    return generatedBlocks;
+
 };
 
+// todo: add dynamic block to edited form
+//const addSavedDynamicBlock = (formFields: PdfField[], dynamicFields: PdfField[]) => {}
 
 interface Props {
     form: PdfForm;
@@ -41,19 +38,15 @@ interface Props {
 
 const FormFields = ({ form, updateFields, registerRef }: Props) => {
     
-    const { technicians } = useTechnician();
-    const { manufactures } = useManufacture();
+    const { technicians } = useTechnician();    
     
     const [ provider, setProvider ] = useState<string | boolean>(false);
-    const [ showStorage, setShowStorage ] = useState(false);        
-    const [ dynamicFields, setdynamicFields ] = useState<PdfField[]>([]);
+    const [ showStorage, setShowStorage ] = useState(false);            
+    const [ dynamicBlocks, setdynamicBlocks ] = useState<FormBlocks[]>([]);    
     
     const dynamicBlocksSize = useRef<number>(1);
-
     const formFieldsRef = useRef<HTMLDivElement | null>(null);     
-    const formBlocks = useMemo(() => generateFormBlocks(form.formFields, dynamicFields), [form.formFields]);
-    
-    //console.log('FormFields.render=>form.formFields',form.formFields)
+    const formBlocks = useMemo(() => generateFormBlocks(form.formFields, dynamicBlocks, dynamicBlocksSize.current), [form.formFields]);
 
     useEffect(() => {
         // check if storage form 
@@ -88,12 +81,18 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
     } 
 
     const addNewFields = () => {
-        //todo: add new fields in seperate block
-        const newFields = newFormFieldsMap['bizPermit']?.(dynamicBlocksSize.current, form.name) || [];        
-        form.formFields = [...form.formFields, ...newFields];
-        dynamicBlocksSize.current++;
-        setdynamicFields((prev) => [...prev, ...newFields]);
-        //        
+        const newFields = getDynamicFields[form.name]?.(dynamicBlocksSize.current, form.name) || [];                
+        if (newFields.length) {
+            dynamicBlocksSize.current++;
+            form.formFields = [...form.formFields, ...newFields];
+            setdynamicBlocks((prev) => [
+                ...prev ,
+                {
+                    name: form.name+ 'tbl' + dynamicBlocksSize.current,
+                    fields: newFields,       
+                }
+            ]);                       
+        }
     }
 
 
@@ -120,12 +119,9 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
                                     registerRef={registerRef} 
                                     formName={ form.name }
                                     field={ field } 
-                                    provider= { provider }
-                                    technicians={ technicians } 
-                                    manufactures={ manufactures }
+                                    provider= { provider }                                    
                                     dropdownChange={ handleDropdownChange }
-                                    />
-                                    
+                                    />                                    
                             ))}                    
                         </div>                        
                     </div>

@@ -10,13 +10,9 @@ import { buildFormModel, mapFieldsToForms } from "../utils/formUtils";
 import { getCachedCompanyInfo } from "../lib/cache/companyInfoCache";
 import { isStorageForm } from "@/app/utils/helper";
 
-
-type ServiceResult<T = any> = {
-    success: boolean;
-    message: string;
-    data?: T;
-    error?: any;
-  };  
+  
+//todo revmoe to a type file
+type FetchFunction = (userId: number, tblShort: string) => Promise<any>;
 
 /**
  * Refactor: this use is for tcelcric, might not needed for new customers
@@ -112,9 +108,6 @@ const _saveData = async (payload: FormPayload, fields:formModel) => {
         return await updateForm(payload.form.id, fields, tbl);        
     }
 }
-
-//todo revmoe to a type file
-type FetchFunction = (userId: number, tblShort: string) => Promise<any>;
 
 export const getUserActiveForms = async (user: User, tblShort: string): Promise<PdfForm[]> => {
     

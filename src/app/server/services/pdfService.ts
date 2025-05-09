@@ -235,8 +235,12 @@ const _fillPdfFields = async (pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, e
 };
 
 const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
-
+    /**
+     * todo: refactor => now you call pdfFormFields every type even if thers no type in that form
+     * call pdfFormFields only if needed
+     */
     const pdfFields = pdfForm.getFields();
+
     // CheckBox fields 
     const checkFields: PdfField[] = pdfFormFields['PDFCheckBox']?.(pdfFields.filter(field => field instanceof PDFCheckBox), formName);    
     
@@ -330,6 +334,7 @@ export const generateDocumnet = async (form: PdfForm): Promise<Uint8Array | []> 
         // }
 
         //todo: move this to a seperate function
+        // Add customer field to formFields
         if (form.name === 'schindler') {
             form.formFields.push({
                 name: 'customer',

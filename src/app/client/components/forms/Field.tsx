@@ -1,37 +1,25 @@
 'use client';
-import { dropDownOptionsMap, facillties, fieldsNameMap } from '@/app/utils/AppContent';
-import { ListOption, PdfField } from '@/app/utils/types/formTypes';
+import { dropDownOptionsMap, fieldsNameMap } from '@/app/utils/AppContent';
+import { PdfField } from '@/app/utils/types/formTypes';
 import React, { useMemo } from 'react'
 import SearchableDropdown, { SearchableDropdownHandle } from './SearchableDropdown';
 import { Manufacture, Technicians } from '@/app/utils/types/entities';
-import { OptionKeys, OptionsMap } from '@/app/utils/types/formTypes';
-import { getOptionsMap } from '../../helpers/fieldhelper';
+import { getInspectionDropdownOptions } from '../../helpers/fieldhelper';
+import { useTechnician } from '../../hooks/useTechnician';
+import { useManufacture } from '../../hooks/useManufacture';
 
 interface Props {
     formName: string;
     field: PdfField;
     registerRef: (ref: SearchableDropdownHandle | null) => void;
     provider: string | boolean;
-    technicians: Technicians[];
-    manufactures: Manufacture[];
     dropdownChange: (value: string, name: string, id?: number) => void;    
 }
 
-const Field = ({ formName, field, registerRef, technicians, manufactures, provider, dropdownChange }: Props) => {    
+const Field = ({ formName, field, registerRef, provider, dropdownChange }: Props) => {    
 
-    const getFieldOptions = useMemo(() => {    
-        //todo get inspection dropdown option in server
-        //todo get getOptionsMap only for inspection and -ls field
-        const optionsMap = getOptionsMap(technicians, manufactures, provider);
-        const fieldName = field.name.replace("-ls", "");
-        
-        //todo: Optimize
-        if (formName === 'bizpermit') {            
-            field.options = dropDownOptionsMap[formName][field.name]
-        }
-
-        return field.options || optionsMap[fieldName as OptionKeys];
-    },[field.options, technicians, manufactures, provider, field.name])
+    const { technicians:techs } = useTechnician();
+    const { manufactures: manus } = useManufacture();
 
     const setFieldLabel = useMemo(() => {        
         const rawKey = field.type === 'DropDown' ? field.name.replace('-ls', '') : field.name;
@@ -41,17 +29,26 @@ const Field = ({ formName, field, registerRef, technicians, manufactures, provid
 
     const inputType = field.name === 'setdate' ? 'date' : 'text';
 
-    const FieldType: Record<string, JSX.Element> = {
-        DropDown: (
-            <SearchableDropdown 
-                ref={registerRef} 
-                field={field}  
-                options={getFieldOptions}                                 
-                text="חפש"
-                value={field.value || ''} 
-                onValueChange={dropdownChange} 
-            />
-        ),
+    const FieldType: Record<string, JSX.Element> = {        
+        DropDown: (() => {            
+            let dropdownOptions = field.options || getInspectionDropdownOptions(field, techs, manus, provider);            
+            
+            // todo: consider refactor
+            if(field.name.startsWith('check')){//if (formName === 'bizpermit' && field.name === 'checkswitch') {                
+                dropdownOptions = dropDownOptionsMap?.[formName]?.[field.name] || dropdownOptions;
+            }
+
+            return (
+                <SearchableDropdown 
+                    ref={registerRef} 
+                    field={field}  
+                    options={dropdownOptions}                                 
+                    text="חפש"
+                    value={field.value || ''} 
+                    onValueChange={dropdownChange} 
+                />
+            );
+        })(),        
         TextArea: (
             <textarea 
                 className="form-field mt-1 w-full border border-gray-300 rounded-lg shadow-sm" 

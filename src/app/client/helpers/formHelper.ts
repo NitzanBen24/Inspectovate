@@ -72,16 +72,16 @@ export const isDynamicForm = (formName: string) => {
     return (formName === 'bizpermit') ? true : false;
 }
 
-export const newFormFieldsMap = {
-    bizPermit: (index: number, formName: string) => {
-        return formFieldMap.bizpermittbl.map(fieldName => {
+export const getDynamicFields: any = {
+    'bizpermit': (index: number, formName: string) => {
+        return formFieldMap.bizpermittbl.map(fieldName => {            
             return {
                 name: fieldName.endsWith('-ls') ? fieldName.replace('-ls', index+'-ls') : fieldName + index,
                 type: fieldName.endsWith('-ls') ? 'DropDown' : 'PDFTextField',
                 require: true,
                 options: dropDownOptionsMap[formName][fieldName]
-            }
-        });        
+            }            
+        });                  
     }
 }
 

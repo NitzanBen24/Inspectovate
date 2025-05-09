@@ -20,6 +20,11 @@ export interface PdfForm {
     signature?: any;
 }
 
+export interface FormBlocks {
+    name: string;
+    fields: PdfField[];
+}
+
 export type FieldsObject = {
     [key: string]: string;// | PdfField[]; // Dynamic key-value pairs for each form input
 }

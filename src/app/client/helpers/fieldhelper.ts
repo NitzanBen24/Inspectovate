@@ -1,9 +1,9 @@
 import { facillties } from "@/app/utils/AppContent";
 import { Manufacture, Technicians } from "@/app/utils/types/entities";
-import { OptionsMap } from "@/app/utils/types/formTypes";
+import { OptionKeys, OptionsMap, PdfField } from "@/app/utils/types/formTypes";
 
 //todo use this in server
-export const getOptionsMap = (technicians: Technicians[], manufactures: Manufacture[], provider: string | boolean): OptionsMap => ({
+const _getOptionsMap = (technicians: Technicians[], manufactures: Manufacture[], provider: string | boolean): OptionsMap => ({
     provider: Array.from(new Set(technicians.map((tech) => tech.employer))),
     electrician: technicians
         .filter((tech) => tech.profession === 'electrician' && tech.employer === provider)
@@ -19,3 +19,12 @@ export const getOptionsMap = (technicians: Technicians[], manufactures: Manufact
         .map((item) => item.name),
     facillity: facillties
 });
+
+
+export const getInspectionDropdownOptions = (field: PdfField,technicians: Technicians[], manufactures: Manufacture[], provider: string | boolean) => {
+ 
+    const optionsMap = _getOptionsMap(technicians, manufactures, provider);
+    const fieldName = field.name.replace("-ls", "");
+    
+    return optionsMap[fieldName as OptionKeys];
+}

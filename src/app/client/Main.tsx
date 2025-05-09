@@ -11,9 +11,8 @@ import { AuthFail, AuthResponse } from '../utils/types/apiTypes';
 import { isAuthResponse } from '../utils/auth/typeGuards';
 import { Spinner } from './components/ui/Spinner';
 import AppHeader from './components/ui/AppHeader';
-import FormsDashboard from './components/forms/FormsDashboard';
 import HomeView from './views/HomeView';
-import { FormFieldsProvider } from './contexts/FormFieldsContext';
+//import { FormFieldsProvider } from './contexts/FormFieldsContext';
 
 
 
@@ -50,11 +49,11 @@ const Main = () => {
                     
             <ManufactureProvider>
             <TechniciansProvider>
-            <FormFieldsProvider>
+            
                 <Container fluid className='main-container'>                    
                     <HomeView />
                 </Container>
-            </FormFieldsProvider>                
+                           
             </TechniciansProvider>
             </ManufactureProvider>
               

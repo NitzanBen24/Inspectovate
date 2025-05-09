@@ -6,10 +6,10 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useRef } from 'react';
 import { FieldsObject, PdfForm } from '@/app/utils/types/formTypes';
 import { useUser } from '../../hooks/useUser';
-import { addInspectionFields, calcPower, formatHebrewDate } from '../../helpers/formHelper';
+import { addInspectionFields, calcPower, formatHebrewDate, isDynamicForm } from '../../helpers/formHelper';
 import { SearchableDropdownHandle } from './SearchableDropdown';
 import { useImageUpload, usePost } from '../../hooks/useQuery';
-import { appStrings, checkBoxesEndName } from '@/app/utils/AppContent';
+import { appStrings, checkBoxesValue } from '@/app/utils/AppContent';
 import { getHebrewFormName } from '@/app/utils/helper';
 import { Spinner } from '../ui/Spinner';
 import Modal from '../ui/Modal';
@@ -38,10 +38,8 @@ const Form = ({ form, close }: Props) => {
     const [ showSignature, setShowSignature ] = useState(false);
 
     
-    const sendMail = useRef(false);
-    //const hasStorageForm = useRef<boolean>(false);
-    const formRef = useRef<HTMLDivElement | null>(null);     
-    const sendRef = useRef<HTMLInputElement | null>(null);        
+    const sendMail = useRef(false);    
+    const formRef = useRef<HTMLDivElement | null>(null);       
     const dropdownRefs = useRef<SearchableDropdownHandle[]>([]);// Array of DropDown lists refs
     const attachmentsRef = useRef<{ clear: () => void } | null>(null);
 
@@ -164,8 +162,9 @@ const Form = ({ form, close }: Props) => {
             form.status = 'saved';        
         }
 
-        if (btnId === 'BtnSend') {         
-            if (user.role === 'admin' || (user.role === 'supervisor' && form.name !== 'inspection')) {
+        if (btnId === 'BtnSend') {        
+            //tood: refactor => dynamic form are sent also with role user  
+            if (user.role === 'admin' || (user.role === 'supervisor' && form.name !== 'inspection') || isDynamicForm(form.name)) {
                 form.status = 'sent';                
             } else {
                 form.status = 'pending';
@@ -232,15 +231,15 @@ const Form = ({ form, close }: Props) => {
         const fieldsCollection = formRef.current?.getElementsByClassName('form-field');
         if (fieldsCollection) {
             [...fieldsCollection].forEach(field => {
-                const inputField = field as HTMLInputElement | HTMLTextAreaElement;                  
+                const inputField = field as HTMLInputElement | HTMLTextAreaElement;                     
                 const fieldName = inputField.getAttribute('name'); // Get the name attribute                
                 let fieldValue = inputField.value;
                 if (fieldName) {                                       
-                    const currFiled = form.formFields.find((item) => item.name === fieldName);
+                    const currFiled = form.formFields.find((item) => item.name === fieldName);                    
                     if (currFiled) {
-                        //todo: Optimize
-                        if (form.name === 'bizpermit' && fieldName === 'checkswitch') {                            
-                            fieldValue = checkBoxesEndName[form.name][fieldName][fieldValue];
+                        //todo: consider Optimize 
+                        if (fieldName.startsWith('check')) {                            
+                            fieldValue = checkBoxesValue[form.name]?.[fieldName]?.[fieldValue] || fieldValue;                         
                         }
                         
                         currFiled.value = fieldValue;
@@ -250,7 +249,7 @@ const Form = ({ form, close }: Props) => {
         }
     }
 
-    const submitForm = (submissionForm: PdfForm) => {           
+    const submitForm = (submissionForm: PdfForm) => {        
         formSubmit({
             userId: submissionForm.userId || user.id, 
             userName: submissionForm.userName || user.name,
@@ -356,8 +355,8 @@ const Form = ({ form, close }: Props) => {
             { showSignature && <button onClick={saveSignature}>sign</button>} */}
 
             {  
-                form.images ? <div className='py-2 text-right text-green-500'>{appStrings.attchmentsExists}</div> 
-                            : <AttachFile ref={attachmentsRef} updateFiles={updateImages}/> 
+                (!isDynamicForm(form.name)) && (form.images ? <div className='py-2 text-right text-green-500'>{appStrings.attchmentsExists}</div> 
+                            : <AttachFile ref={attachmentsRef} updateFiles={updateImages}/> )
             }                                
             
         </div>
