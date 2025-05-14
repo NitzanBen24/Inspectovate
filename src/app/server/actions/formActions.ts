@@ -28,7 +28,8 @@ export async function getFormsByUserId(userId : string): Promise<any> {
         })
         
         const { forms: pdfFiles } = await getPdfForms(formsNames);                
-        const activeForms = await getUserActiveForms(user, tbl)
+        //todo refactor user basic        
+        const activeForms = user.role !== 'basic' ? await getUserActiveForms(user, tbl) : []
         
         return { pdfFiles, activeForms };
 

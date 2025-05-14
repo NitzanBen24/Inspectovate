@@ -83,7 +83,7 @@ const FormsDashboard = () => {
             ) : (     
              <>        
                  <RenderFormsLists records={sortedRecords()} selectForm={selectForm} /> 
-                 { (user.role !== 'user') && <Archvie selectForm={selectForm}/> }
+                 { (user.role === 'admin' || user.role === 'supervisor') && <Archvie selectForm={selectForm}/> }
             </>   
             )}      
         </div>        

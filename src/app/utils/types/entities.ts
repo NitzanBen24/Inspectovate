@@ -7,6 +7,7 @@ export interface User {
     email: string;
     role: string;
     company_id:number;
+    company_name: string;
     created_at?: string;
     isLoggedIn?: boolean; 
 }

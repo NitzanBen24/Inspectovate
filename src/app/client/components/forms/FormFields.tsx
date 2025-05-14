@@ -6,7 +6,7 @@ import Field from './Field';
 import { SearchableDropdownHandle } from './SearchableDropdown';
 import { useTechnician } from '../../hooks/useTechnician';
 import { isStorageForm } from '@/app/utils/helper';
-import { getDynamicFields, isDynamicForm } from '../../helpers/formHelper';
+import { dynamicForms, getNewFormBlock } from '../../helpers/formHelper';
 
 
 const generateFormBlocks = (staticFields: PdfField[], blocks: FormBlocks[], blockSize: number) => {
@@ -61,6 +61,7 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
     
     const handleDropdownChange = useCallback((value: string, name: string, id?: number) => {           
         if (name === 'provider') {
+            /** todo clean technicians info from form.formfields */
             setProvider(value)
         }            
         if (id && (name === 'electrician-ls' || name === 'planner-ls')) setTechniciansDetails(name, value, id);
@@ -80,8 +81,8 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
         }                                 
     } 
 
-    const addNewFields = () => {
-        const newFields = getDynamicFields[form.name]?.(dynamicBlocksSize.current, form.name) || [];                
+    const addNewFields = () => {        
+        const newFields = getNewFormBlock(form.name, dynamicBlocksSize.current);
         if (newFields.length) {
             dynamicBlocksSize.current++;
             form.formFields = [...form.formFields, ...newFields];
@@ -128,7 +129,7 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
                 );
             })}
 
-            {isDynamicForm(form.name) && <button type="button" onClick={ addNewFields } className="mt-4 text-blue-500 hover:text-blue-700">
+            {dynamicForms.includes(form.name) && <button type="button" onClick={ addNewFields } className="mt-4 text-blue-500 hover:text-blue-700">
                 הוסף לוח חשמל  
             </button>}
 

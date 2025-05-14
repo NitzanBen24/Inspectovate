@@ -20,15 +20,18 @@ const AppHeader = ({ logOutUser }: Props) => {
                     {user.isLoggedIn ? <button className='border-2 p-1 text-xs border-black text-blck rounded-lg' onClick={ logOutUser }>Logout</button> : ''}
                 </div>
                 <div className="logo p-2">
-                    <Image
-                        src="/img/logo.jpg"
+                    {/**
+                     * todo, remove tcelctric, add my logo if theres any from client
+                     */}
+                    {user.company_name === 'tcelctric' && <Image
+                        src={"/img/"+user.company_name+"/logo.jpg"}
                         alt="Company Logo"
                         // layout="responsive"
                         width={86}
                         height={76}
                         objectFit="contain"
                         priority                    // Loads the logo quickly
-                    />
+                    />}
                 </div>
             </div>
         </div>

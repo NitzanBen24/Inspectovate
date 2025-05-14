@@ -25,23 +25,26 @@ export const getHebrewFormName = (fileName: string) : string => {
 		charge: 'עמדת טעינה', 
 		schindler: 'שינדלר מעליות',
 		bizpermit: 'רישוי עסקים',
-		inspectest: 'סולארי דוגמא'
+		inspectest: 'סולארי דוגמא',
+    	firehoses: 'טופס 1 זרנוקים גלגלונים',
+		workpermit: 'טופס 3 רישוי עסקים',
+		fireequip: 'טופס 2 ציוד כיבוי'
 	};
 
     return names[fileName] || '';
 }
 
 export const getEnglishFormName = (fileName: string) : string => {
-    const names: any = { בדיקה: 'inspection', מעליות: 'elevator', טעינה: 'charge'};
+    const names: any = {
+		 'בדיקה': 'inspection',
+		 'מעליות': 'elevator',
+		 'טעינה': 'charge',
+		 'שינדלר מעליות': 'schindler',
+		 'רישוי עסקים': 'bizpermit'
+	};
 
     return names[fileName] || '';
 }
-
-// export const getTableName = (fileName: string) : string => {
-//     const names: any = { בדיקה: 'inspection_forms', מעליות: 'equipment_forms', טעינה: 'equipment_forms'};
-
-//     return names[fileName] || '';
-// }
 
 export const getQueryFields = (obj: Record<string, any>): Record<string, any> => {
     return Object.fromEntries(
@@ -51,7 +54,7 @@ export const getQueryFields = (obj: Record<string, any>): Record<string, any> =>
 
 export const getHebrewString = (str: string): string => {
     // todo: consoder move to appContent
-    const options: Record<string, string> = 
+    const hebrewStrings: Record<string, string> = 
       {
         files: 'בחר טופס',
         saved: 'שמורים',
@@ -66,10 +69,10 @@ export const getHebrewString = (str: string): string => {
         evolt: 'evolt',
         inspectest: 'דוגמא בדיקה',
         schindler: 'שינדלר',
-        bizpermit: 'רישוי עסקים'
+        bizpermit: 'רישוי עסקים',
       }
   
-    return options[str];
+    return hebrewStrings[str];
   }
 
 export const isEmptyProps = (obj: Record<string, any>): boolean =>  Object.values(obj).every(value => !value);

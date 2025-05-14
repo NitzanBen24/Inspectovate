@@ -8,12 +8,14 @@ import { pdfFillerFields, pdfFormFields, reverseEnglishAndNumbers } from '../uti
 
 function _extraFields(fileName: string): PdfField[] {
     
+    const excludeComments = ['bizpermit', 'schindler', 'firehoses', 'workpermit', 'fireequip']
     const moreFields = [];
+
     if (fileName === 'inspection') {
         moreFields.push('message', 'provider','batteries','capacity', 'bmanufacture');
     }
 
-    if (fileName !== 'bizpermit' && fileName !== 'schindler') {
+    if (!excludeComments.includes(fileName)) {
         moreFields.push('comments')
     }
     
@@ -261,32 +263,26 @@ export const getPdfForms = async (fileNames: string[]): Promise<{ forms: PdfForm
     try {
         const pdfFolder = path.resolve('./public/templates');
         // Get all PDF files asynchronously
-        const pdfNames = (await fs.promises.readdir(pdfFolder)).filter(file => file.endsWith('.pdf'));      
-        
+        const pdfNames = (await fs.promises.readdir(pdfFolder)).filter(file => file.endsWith('.pdf'));              
         for (const fileName of pdfNames) {
             const filePath = path.join(pdfFolder, fileName);
             const form: PdfForm = { name: fileName.replace('.pdf', ''), formFields: [], status: 'new' }; // Initialize form                    
-                                
-            if (fileNames.includes(form.name)) {   
     
-                try {
-                    // Load and parse PDF document                                                    
-                    const pdfDoc = await _loafPDF(filePath);
-                    const pdfForm = pdfDoc.getForm();                                      
-                    if (pdfForm) {                        
-                        form.formFields = _getFormFields(pdfForm, form.name);                    
-                    }
+            if (fileNames.includes(form.name)) {                
+                // Load and parse PDF document                                                                   
+                const pdfDoc = await _loafPDF(filePath);
 
-                    form.formFields.push(..._extraFields(form.name));
-                    
-                    // Only push forms with fields
-                    if (form.formFields.length > 0) {
-                        forms.push(form);
-                    }
-                    
-                } catch (error) {
-                    throw new Error(`Error processing file ${fileName}:`)                
-                }                    
+                const pdfForm = pdfDoc.getForm();                   
+                if (pdfForm) {                        
+                    form.formFields = _getFormFields(pdfForm, form.name);                    
+                }
+                
+                form.formFields.push(..._extraFields(form.name));
+                
+                // Only push forms with fields
+                if (form.formFields.length > 0) {
+                    forms.push(form);
+                }               
             }
         }
       

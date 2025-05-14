@@ -1,4 +1,4 @@
-import { dropDownOptionsMap, formFieldMap } from "@/app/utils/AppContent";
+import { dropDownOptionsMap, formFieldMap, tblFormFieldMap } from "@/app/utils/AppContent";
 import { elementsWithValueExist } from "@/app/utils/helper";
 import { FieldsObject, PdfField } from "@/app/utils/types/formTypes";
 
@@ -68,21 +68,18 @@ export const addInspectionFields = (formFields: PdfField[], formRef: React.Mutab
     return addFields;
 }
 
-export const isDynamicForm = (formName: string) => {    
-    return (formName === 'bizpermit') ? true : false;
-}
 
-export const getDynamicFields: any = {
-    'bizpermit': (index: number, formName: string) => {
-        return formFieldMap.bizpermittbl.map(fieldName => {            
+export const dynamicForms: string[] = ['bizpermit', 'firehoses', 'workpermit', 'fireequip']
+
+export const getNewFormBlock = (formName: string, index: number) => {            
+    return tblFormFieldMap[formName+'tbl'].map(fieldName => {                    
             return {
                 name: fieldName.endsWith('-ls') ? fieldName.replace('-ls', index+'-ls') : fieldName + index,
                 type: fieldName.endsWith('-ls') ? 'DropDown' : 'PDFTextField',
                 require: true,
-                options: dropDownOptionsMap[formName][fieldName]
+                options: dropDownOptionsMap?.[formName]?.[fieldName]
             }            
-        });                  
-    }
+        });  
 }
 
 // todo: can be used also not in Form component => should be move to a general folder

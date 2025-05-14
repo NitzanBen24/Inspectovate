@@ -6,7 +6,7 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useRef } from 'react';
 import { FieldsObject, PdfForm } from '@/app/utils/types/formTypes';
 import { useUser } from '../../hooks/useUser';
-import { addInspectionFields, calcPower, formatHebrewDate, isDynamicForm } from '../../helpers/formHelper';
+import { addInspectionFields, calcPower, dynamicForms, formatHebrewDate } from '../../helpers/formHelper';
 import { SearchableDropdownHandle } from './SearchableDropdown';
 import { useImageUpload, usePost } from '../../hooks/useQuery';
 import { appStrings, checkBoxesValue } from '@/app/utils/AppContent';
@@ -157,18 +157,26 @@ const Form = ({ form, close }: Props) => {
     };
 
     const setFormStatus = (btnId: string) => {
-        
+        /** todo: add only send action, no saving the form
+         * you need to set status to set for permit forms
+         * maybe try to set an action based on the form name
+         * make sure to keep the the split save and send submit for tcelctric forms
+         */
         if (btnId === 'BtnSave') {       
             form.status = 'saved';        
         }
 
         if (btnId === 'BtnSend') {        
             //tood: refactor => dynamic form are sent also with role user  
-            if (user.role === 'admin' || (user.role === 'supervisor' && form.name !== 'inspection') || isDynamicForm(form.name)) {
+            if (user.role === 'admin' || (user.role === 'supervisor' && form.name !== 'inspection') || dynamicForms.includes(form.name)) {
                 form.status = 'sent';                
             } else {
                 form.status = 'pending';
-            }            
+            }     
+            
+            if (user.role === 'basic') {
+                form.status = 'sent';
+            }
         }
     }
 
@@ -257,7 +265,7 @@ const Form = ({ form, close }: Props) => {
             form: submissionForm,
             company_id: submissionForm.company_id || user.company_id,            
             sendMail: sendMail.current,
-            action: 'submit'
+            action: 'submit'//todo => use action to add only send submmition to permit forms
         });
         
     }
@@ -337,9 +345,9 @@ const Form = ({ form, close }: Props) => {
                 <button id='BtnSend' className='w-full border-2 border-black text-blck px-4 mt-3 py-2 rounded-lg' type="button" onClick={handleFormSubmit} disabled={isPending}>
                     שלח
                 </button>
-                <button id='BtnSave' className='w-full border-2 border-black text-blck px-4 mt-3 py-2 rounded-lg' type="button" onClick={handleFormSubmit} disabled={isPending}>
+                {user.role !=='basic' && <button id='BtnSave' className='w-full border-2 border-black text-blck px-4 mt-3 py-2 rounded-lg' type="button" onClick={handleFormSubmit} disabled={isPending}>
                     שמור
-                </button>
+                </button>}
             </div>
 
             {/* {    
@@ -355,7 +363,7 @@ const Form = ({ form, close }: Props) => {
             { showSignature && <button onClick={saveSignature}>sign</button>} */}
 
             {  
-                (!isDynamicForm(form.name)) && (form.images ? <div className='py-2 text-right text-green-500'>{appStrings.attchmentsExists}</div> 
+                (!dynamicForms.includes(form.name)) && (form.images ? <div className='py-2 text-right text-green-500'>{appStrings.attchmentsExists}</div> 
                             : <AttachFile ref={attachmentsRef} updateFiles={updateImages}/> )
             }                                
             

@@ -27,7 +27,7 @@ const Field = ({ formName, field, registerRef, provider, dropdownChange }: Props
         return fieldsNameMap[rawKey] ?? fieldsNameMap[rawKey.slice(0, -1)];
     }, [field]) ;
 
-    const inputType = field.name === 'setdate' ? 'date' : 'text';
+    const inputType = (field.name === 'setdate' || field.name === 'nextdate') ? 'date' : 'text';
 
     const FieldType: Record<string, JSX.Element> = {        
         DropDown: (() => {            
@@ -37,7 +37,7 @@ const Field = ({ formName, field, registerRef, provider, dropdownChange }: Props
             if(field.name.startsWith('check')){//if (formName === 'bizpermit' && field.name === 'checkswitch') {                
                 dropdownOptions = dropDownOptionsMap?.[formName]?.[field.name] || dropdownOptions;
             }
-
+            /** todo: saved checkbox fields, ths value is the oprion in English => change to Hebrew */
             return (
                 <SearchableDropdown 
                     ref={registerRef} 

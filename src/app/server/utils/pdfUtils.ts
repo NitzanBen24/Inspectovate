@@ -87,7 +87,7 @@ export const pdfFormFields: any = {
                     fieldMap[name] = {
                         name,
                         type: 'DropDown',
-                        require: true,
+                        require: true,//this is unneccessary, theres no meanning for require in checkbox field (for now)
                         value: '',
                         options: []//todo consider get option from dropDownOptionsMap instead of the ending of the field name
                     };
@@ -98,7 +98,8 @@ export const pdfFormFields: any = {
         
         return Object.values(fieldMap);  // Return the fields with their options
     },
-    'tblField': (fields: PDFField[], formName: string) => {        
+    'tblField': (fields: PDFField[], formName: string) => {    
+
         return fields.map((field) => {            
             const fieldName = field.getName();
             const fieldType = (fieldName.endsWith('-ls')) ? 'DropDown' : 'PDFTextField';            
@@ -106,7 +107,7 @@ export const pdfFormFields: any = {
                 name: fieldName,
                 type: fieldType,
                 require: field.isRequired(),                
-                options: dropDownOptionsMap[formName][fieldName]                
+                options: dropDownOptionsMap?.[formName]?.[fieldName]
             };
         }); 
     }

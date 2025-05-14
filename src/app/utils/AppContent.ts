@@ -50,7 +50,7 @@ export const appStrings = {
 }
 
 // todo: change name, maybe formBlocksMap
-export const formFieldMap = {
+export const formFieldMap: Record<string, string[]> = {
     //inspection
     head:['provider'],
     info:['customer', 'invoice', 'address', 'facillity-ls'],
@@ -58,19 +58,38 @@ export const formFieldMap = {
     convertor: ['cunits', 'cpower', 'convertor-ls', 'cmodel'],
     panel: ['punits', 'ppower', 'panel-ls', 'pmodel'],
     techs: ['electrician-ls', 'elicense', 'ephone', 'eemail','planner-ls', 'plicense', 'pphone', 'pemail'],
-    data: ['voltl', 'voltn', 'omega', 'pm', 'rcurrent', 'mcurrent'],//, 'check'
+    data: ['voltl', 'voltn', 'omega', 'pm', 'rcurrent', 'mcurrent'],
     //storage
     storage: ['batteries','capacity', 'bmanufacture'],
     //elevator
     elevator: ['elevator', 'mainbreaker', 'mainbreakersize', 'officenum', 'checkgrounding', 'checkamper'],
     //charge
     charge: ['station', 'manufacture', 'model', 'power',  'maxcurrent', 'breakersize'],
-    //bizpermit
-    bizpermit: ['filenum', 'bizname', 'biztype', 'regnum',  'city', 'street', 'addressnum', 'setdate', 'checkswitch'],
-    bizpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
-    end: ['comments', 'message'],
-    signature: ['signature']
-    
+    //permit
+    permitbiz: ['filenum', 'bizname', 'biztype', 'regnum',  'city', 'street', 'addressnum'],//, 'setdate', 'checkswitch'    
+    permitcontact: ['contactname','contactrole', 'contactphone', 'contactemail'],
+	permitrest: ['inspectorname','inspectorid', 'confirmnum', 'setdate', 'checkswitch', 'checkfirehoses'],
+	
+	//tables	
+	//workpermit & bizpermit
+	workpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
+	//firehoses
+	firehosestbl: ['tbl_stationnum', 'tbl_stationpos','tbl_dash-ls', 'tbl_eqcabinet-ls', 'tbl_fireroller-ls', 'tbl_fabrichose-ls', 'tbl_comments'],
+    //fireequip
+	extinguisher: ['tbl_serialnum', 'tbl_extinguisherpos', 'tbl_extinguishertype', 'tbl_nominalsize', 'tbl_extingmanu', 'tbl_duedateins', 'tbl_duedatepre', 'tbl_pass', 'tbl_fail', 'tbl_comment'],
+	end: ['comments', 'message'],
+	signature: ['signature'],
+}
+
+export const tblFormFieldMap: Record<string, string[]> = {
+	//bizpermit
+	bizpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
+	//workpermit
+	workpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
+	//firehoses
+	firehosestbl: ['tbl_stationnum', 'tbl_stationpos','tbl_dash-ls', 'tbl_eqcabinet-ls', 'tbl_fireroller-ls', 'tbl_fabrichose-ls', 'tbl_comments'],
+	//fireequip
+	fireequiptbl: ['tbl_serialnum', 'tbl_extinguisherpos', 'tbl_extinguishertype', 'tbl_nominalsize', 'tbl_extingmanu', 'tbl_duedateins', 'tbl_duedatepre', 'tbl_pass', 'tbl_fail', 'tbl_comment'],
 }
 
 // FormFeilds
@@ -129,12 +148,41 @@ export const fieldsNameMap: any = {
     addressnum: 'מס׳',
     checkswitch: 'קיום מפסק',
     setdate: 'תאריך ביקור',
+	//permit tbl
     tbl_panel_num: 'מספר הלוח',
     tbl_panel_pos: 'מיקום הלוח',    
     tbl_panel_ampsize: 'גודל האמפר',
     tbl_panel_cut: 'ניתוק',
     tbl_panel_vis: 'גילוי',
     tbl_panel_down: 'כיבוי',
+    tbl_stationnum: 'מספר עמדה',
+    tbl_stationpos: 'מיקום עמדה',
+
+    tbl_dash: 'זרנוק בד 2',
+    tbl_fabrichose:'מזנק 2',
+    tbl_eqcabinet: 'ארון ציוד',
+    tbl_fireroller: 'גלגלון כיבוי',
+    tbl_comments: 'הערות',
+	
+	tbl_serialnum: 'מספר מטפה',
+	tbl_extinguisherpos: 'מיקום מטפה',
+	tbl_extinguishertype: 'סוג מטפה',
+	tbl_nominalsize: 'גודל נומינלי',
+	tbl_extingmanu: 'יצרן המטפה',
+	tbl_duedateins: 'מועד יסודית הבאה',
+	tbl_duedatepre: 'מועד לחץ הבאה',
+	tbl_pass: 'תקין',
+	tbl_fail: 'לא תקין',
+	tbl_comment: 'הערות',
+	//permit
+	checkfirehoses:'מטף כיבוי',
+	inspectorname: 'שם הבודק',
+	inspectorid: 'ת.ז',
+	contactname: 'איש קשר',
+	contactrole: 'תפקיד',
+	contactphone: 'מס׳ נייד',
+	contactemail: 'כתובת דואל',
+	confirmnum: 'מספר אישור',
 
 }
 
@@ -148,11 +196,29 @@ const bizpermitOptions: Record<string, string[]> = {
 	'tbl_panel_vis-ls': ['√', '–'],
 	'tbl_panel_down-ls': ['√', '–'],
 	'checkswitch': ['חשמל חירום תקין', 'UPS תקין']
-  }
+}
 
+const workpermitOption: Record<string, string[]> = {
+	'tbl_panel_pos-ls': ['בפנים', 'בחוץ'],
+	'tbl_panel_cut-ls': ['√', '–'],
+	'tbl_panel_vis-ls': ['√', '–'],
+	'tbl_panel_down-ls': ['√', '–'],
+	'checkswitch': ['חשמל חירום תקין', 'חשמל חירום לא תקין', 'לא קיים', 'UPS תקין', 'UPS לא תקין', 'UPS לא קיים']
+}
+
+const firehosesOptions: Record<string, string[]> = {
+  'tbl_dash-ls': ['קיים', 'לא קיים'],
+  'tbl_fireroller-ls': ['קיים', 'לא קיים'],
+  'tbl_eqcabinet-ls': ['קיים', 'לא קיים'],
+  'tbl_fabrichose-ls': ['קיים', 'לא קיים'],
+  'checkfirehoses': ['זרנוקים', 'מצמדים', 'מזנקים', 'גלגלונים', 'אחר']
+  
+}
 
 export const dropDownOptionsMap: Record<string, typeof bizpermitOptions> = {
-	'bizpermit': bizpermitOptions
+	'bizpermit': bizpermitOptions,
+	'workpermit': workpermitOption,
+  	'firehoses': firehosesOptions,
 }
 
 export const checkBoxesValue: any = {
@@ -161,5 +227,25 @@ export const checkBoxesValue: any = {
 			'חשמל חירום תקין': 'first', 
 			'UPS תקין': 'fourth'
 		}
-	}
+	},
+	'workpermit': {
+		'checkswitch': {
+			'חשמל חירום תקין': 'a',
+			'חשמל חירום לא תקין': 'b',
+			'לא קיים': 'c',
+			'UPS תקין': 'd',
+			'UPS לא תקין': 'e',
+			'UPS לא קיים': 'f',
+		}
+	},
+  	'firehoses': {
+		'checkfirehoses': {
+			'זרנוקים': 'a',
+			'מצמדים': 'b',
+			'מזנקים': 'c',
+			'גלגלונים': 'd',
+			'אחר': 'e',
+		}
+  	}
+  
 }
