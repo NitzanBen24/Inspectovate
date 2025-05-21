@@ -48,7 +48,11 @@ export async function handleDynamicSend(payload: any) {
         const today = formatDateRTL(new Date()).toString();
         const html = generateHtml({ date: today, formFields: updatedFormFields, blocks: payload.dynamicBlocks });
     
-        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+        const browser = await puppeteer.launch({
+            headless: "new", // instead of just `true`,
+            args: ['--no-sandbox']
+        });
+          
         try {
             const page = await browser.newPage(); 
             // todo check what returns
