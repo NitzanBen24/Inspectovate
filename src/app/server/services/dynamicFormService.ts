@@ -49,8 +49,8 @@ export async function handleDynamicSend(payload: any) {
         const html = generateHtml({ date: today, formFields: updatedFormFields, blocks: payload.dynamicBlocks });
     
         const browser = await puppeteer.launch({
-            headless: "new", // instead of just `true`,
-            args: ['--no-sandbox']
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
           
         try {
