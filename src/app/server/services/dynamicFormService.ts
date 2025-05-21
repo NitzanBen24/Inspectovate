@@ -17,7 +17,7 @@ const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) =>
       ];
     
     fieldMap.forEach(({ name, value }) => {
-        const field = fields.find(f => f.name === name);
+        const field = fields.find(f => f.name === name); 
         if (field) field.value = value || '';
     });
     
