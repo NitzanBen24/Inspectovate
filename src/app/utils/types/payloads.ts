@@ -1,5 +1,5 @@
 import { User } from "./entities";
-import { PdfForm } from "./formTypes";
+import { DynamicBlock, PdfForm } from "./formTypes";
 
 
 export interface UploadPayload {
@@ -14,3 +14,10 @@ export interface SearchData {
     user_name?: string;
     date?: string;
 }
+
+
+export type PdfPayload = {
+    date: string;
+    siteName: string;
+    blocks: DynamicBlock[];
+  };

@@ -24,12 +24,14 @@ export const prepareEmail = (receiver: string, form: PdfForm, attachments: any):
         'customer': 'filename',
     };
 
-    form.formFields.forEach((item) => {
-        if (emailFields.includes(item.name as keyof EmailInfo) && item.value) {
-        const key = emailOption[item.name] as keyof EmailInfo;
-        options[key] = item.value as any;
-        }
-    });
+    if (form.formFields) {
+        form.formFields.forEach((item) => {
+            if (emailFields.includes(item.name as keyof EmailInfo) && item.value) {
+            const key = emailOption[item.name] as keyof EmailInfo;
+            options[key] = item.value as any;
+            }
+        });
+    }
 
     if(attachments.length > 0) {
         options.attachments = attachments;
@@ -80,3 +82,29 @@ export async function sendEmail( email: EmailInfo): Promise<any> {
         return { success: false, message: appStrings.email.failed, error: mailError };
     }
 }
+
+
+export async function sendDynamicPdf(pdfBuffer: Buffer, to: string, filename: string) {    
+  
+    try {
+        
+        const info = await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to,
+            subject: 'דו"ח בדיקה מצורף',
+            text: 'מצורף קובץ הדו"ח בפורמט PDF.',
+            attachments: [
+                {
+                    filename: `${filename}.pdf`,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf',
+                },
+            ],
+        });
+    
+        return info;
+    } catch(err) {
+        console.error('error!!', err)
+        return {success: false, err}
+    }
+  }

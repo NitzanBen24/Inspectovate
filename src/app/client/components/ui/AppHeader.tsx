@@ -16,7 +16,7 @@ const AppHeader = ({ logOutUser }: Props) => {
     return (
         <div className="app-header mb-4 px-2">
             <div className="flex justify-between items-center">                
-                <div className="user-toggle">                                                
+                <div className="user-toggle my-2">                                                
                     {user.isLoggedIn ? <button className='border-2 p-1 text-xs border-black text-blck rounded-lg' onClick={ logOutUser }>Logout</button> : ''}
                 </div>
                 <div className="logo p-2">

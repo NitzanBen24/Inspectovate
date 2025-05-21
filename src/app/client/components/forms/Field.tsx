@@ -73,7 +73,7 @@ const Field = ({ formName, field, registerRef, provider, dropdownChange }: Props
         <div className="form-item my-2 flex">
             
             <label className="block content-center text-sm min-w-20 font-medium text-black">
-                {setFieldLabel}:
+                {setFieldLabel || field.label}:
             </label>               
             
             { FieldType[field.type] || FieldType.TextField}

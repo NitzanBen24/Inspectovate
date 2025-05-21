@@ -5,6 +5,7 @@ export interface PdfField {
     require: boolean;
     value?:string;
     options?: string[];
+    label?: string;
 }
 
 export interface PdfForm {
@@ -53,3 +54,19 @@ export type OptionKeys = 'provider' | 'electrician' | 'planner' | 'convertor' | 
 
 // Define the structure of optionsMap
 export type OptionsMap = Record<OptionKeys, string[] | ListOption[]>;
+
+
+export interface DynamicBlock{
+    floor: string;
+    insulation: string;
+    grounding: string;
+    rcd: string;
+};
+
+export interface EmberBlock {    
+    //num: string;        
+    ohm: string;
+    depreciation: string;
+    time: string;
+    eboard: string;
+}

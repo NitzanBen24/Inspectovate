@@ -12,6 +12,7 @@ import { isAuthResponse } from '../utils/auth/typeGuards';
 import { Spinner } from './components/ui/Spinner';
 import AppHeader from './components/ui/AppHeader';
 import HomeView from './views/HomeView';
+import DynamicForm from './components/forms/DynamicForm';
 //import { FormFieldsProvider } from './contexts/FormFieldsContext';
 
 
@@ -50,8 +51,8 @@ const Main = () => {
             <ManufactureProvider>
             <TechniciansProvider>
             
-                <Container fluid className='main-container'>                    
-                    <HomeView />
+                <Container fluid className='main-container'>                                        
+                    {user.company_id === 6 ? <DynamicForm user={ user } /> : <HomeView/>}
                 </Container>
                            
             </TechniciansProvider>
