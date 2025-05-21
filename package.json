@@ -33,9 +33,6 @@
     "react-signature-canvas": "^1.1.0-alpha.1",
     "sanitize-html": "^2.14.0"
   },
-  "puppeteer": {
-    "default_browser_revision": "1360920"
-  },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",

@@ -5,7 +5,7 @@ import { getImageBase64 } from "../../utils";
 const base64String = getImageBase64('davidembersign.png');
 
 export function generateHtml({
-    date,
+    date, 
     formFields,
     blocks,
   }: {

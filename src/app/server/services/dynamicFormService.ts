@@ -50,7 +50,7 @@ export async function handleDynamicSend(payload: any) {
     
         const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
         try {
-            const page = await browser.newPage();
+            const page = await browser.newPage(); 
             // todo check what returns
             await page.setContent(html, { waitUntil: 'networkidle0' });
 
