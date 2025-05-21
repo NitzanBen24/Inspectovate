@@ -52,7 +52,7 @@ const Main = () => {
             <TechniciansProvider>
             
                 <Container fluid className='main-container'>                                        
-                    {user.company_id === 6 ? <DynamicForm user={ user } /> : <HomeView/>}
+                    {(user.company_id === 6 || user.company_id === 7) ? <DynamicForm user={ user } /> : <HomeView/>}                    
                 </Container>
                            
             </TechniciansProvider>
