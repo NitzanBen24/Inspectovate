@@ -10,7 +10,7 @@ const nextConfig = {
         patterns: [
           {
             from: path.resolve('node_modules/@sparticuz/chromium/bin'),
-            to: path.resolve('.next/server/chromium'),
+            to: path.resolve('.next/server/app/api/bin'),
           },
         ],
       })
