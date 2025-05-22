@@ -1,33 +1,22 @@
-import puppeteer, { Browser } from "puppeteer";
-import chromium from "@sparticuz/chromium";
-import path from "path";
-import { fileURLToPath } from "url";
+const isProduction = process.env.VERCEL === '1';
 
-// Detect environment
-const isProduction = process.env.VERCEL;
-
-export async function launchBrowser(): Promise<Browser> {
+export async function launchBrowser() {
   if (isProduction) {
-    const chromiumPath = path.join(
-      process.cwd(),
-      '.next',
-      'server',
-      'app',
-      'api',
-      'bin',
-      'chromium'
-    );
+    const puppeteer = (await import('puppeteer-core')).default;
+    const chromium = (await import('@sparticuz/chromium')).default;
+    const headlessMode = chromium.headless === "new" ? true : chromium.headless;
 
     return await puppeteer.launch({
       args: chromium.args,
-      executablePath: chromiumPath,
-      headless: chromium.headless,
+      executablePath: await chromium.executablePath(),
+      headless: headlessMode,
     });
   } else {
+    const puppeteer = (await import('puppeteer')).default;
+
     return await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
   }
 }
-
