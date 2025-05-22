@@ -2,7 +2,7 @@ import puppeteer, { Browser } from "puppeteer";
 import chromium from "@sparticuz/chromium";
 
 // Detect environment
-const isProduction = process.env.AWS_REGION || process.env.VERCEL;
+const isProduction = process.env.VERCEL;
 
 export async function launchBrowser(): Promise<Browser> {
   if (isProduction) {
