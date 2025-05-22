@@ -5,18 +5,6 @@ import path from 'path';
 const nextConfig = {
   reactStrictMode: false,
   webpack(config) {        
-
-    config.plugins.push(
-      new CopyWebpackPlugin({
-        patterns: [
-          {
-            from: path.resolve('node_modules/@sparticuz/chromium/bin'),
-            to: path.resolve('.next/server/bin'),
-          },
-        ],
-      })
-    );
-
     config.resolve.alias['@fortawesome/fontawesome-svg-core/styles.css'] =
       '@fortawesome/fontawesome-svg-core';
 
