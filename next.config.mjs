@@ -9,8 +9,8 @@ const nextConfig = {
       new CopyWebpackPlugin({
         patterns: [
           {
-            from: path.resolve("node_modules/@sparticuz/chromium/bin"),
-            to: path.resolve(".next/chromium"),
+            from: path.resolve('node_modules/@sparticuz/chromium/bin'),
+            to: path.resolve('public/chromium'),
           },
         ],
       })
