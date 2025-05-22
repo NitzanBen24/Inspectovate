@@ -6,19 +6,17 @@ import { fileURLToPath } from "url";
 // Detect environment
 const isProduction = process.env.VERCEL;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-// // Define local Chromium binary path (adjust if needed)
-const localChromiumPath = path.join(__dirname, "chromium", "chromium");
+// // // Define local Chromium binary path (adjust if needed)
+// const localChromiumPath = path.join(__dirname, "chromium", "chromium");
 
 export async function launchBrowser(): Promise<Browser> {
-  if (isProduction) {
-    //const executablePath = path.join(process.cwd(), "chromium", "chromium"); 
-
+  if (isProduction) {    
     return await puppeteer.launch({
       args: chromium.args,
-      executablePath: localChromiumPath,
+      executablePath: await chromium.executablePath(),
       headless: chromium.headless,
     });
   } else {
