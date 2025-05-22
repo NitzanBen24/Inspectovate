@@ -1,4 +1,3 @@
-import puppeteer from "puppeteer";
 import { generateHtml } from "../lib/pdf-templates/electInspect";
 import { formatDateRTL } from "../utils";
 import { sendDynamicPdf } from "./emailService";
@@ -6,6 +5,7 @@ import { getCachedCompanyInfo } from "../lib/cache/companyInfoCache";
 import { User } from "@/app/utils/types/entities";
 import { PdfField } from "@/app/utils/types/formTypes";
 import { appStrings } from "@/app/utils/AppContent";
+import { launchBrowser } from "../utils/puppeteerBrowser";
 
 const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) => {    
     
@@ -47,11 +47,8 @@ export async function handleDynamicSend(payload: any) {
         const updatedFormFields = await _addUserInfo(payload.user, payload.staticFields, companyInfo);        
         const today = formatDateRTL(new Date()).toString();
         const html = generateHtml({ date: today, formFields: updatedFormFields, blocks: payload.dynamicBlocks });
-    
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
+
+        const browser = await launchBrowser();
           
         try {
             const page = await browser.newPage(); 
