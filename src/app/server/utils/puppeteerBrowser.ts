@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Define local Chromium binary path (adjust if needed)
-const localChromiumPath = path.join(__dirname, "../../../public/chromium-bin/chromium");
+const localChromiumPath = path.resolve(process.cwd(), ".next/chromium/chromium");
 
 export async function launchBrowser(): Promise<Browser> {
   if (isProduction) {
