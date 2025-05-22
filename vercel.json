@@ -1,8 +1,0 @@
-{
-    "functions": {
-      "api/your-api-file.ts": {
-        "includedFiles": ["lib/pdf-templates/**", "app/api/bin/**"]
-      }
-    }
-  }
-  
