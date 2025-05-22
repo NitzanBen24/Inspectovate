@@ -7,8 +7,8 @@ import { fileURLToPath } from "url";
 const isProduction = process.env.VERCEL;
 
 // Get __dirname equivalent in ES modules
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // // Define local Chromium binary path (adjust if needed)
 // const localChromiumPath = path.join("/var/task/public/chromium/chromium");
