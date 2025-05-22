@@ -12,14 +12,15 @@ const isProduction = process.env.VERCEL;
 
 // // Define local Chromium binary path (adjust if needed)
 // const localChromiumPath = path.join("/var/task/public/chromium/chromium");
+const localChromiumPath = path.join(__dirname, "../../../chromium/chromium/chromium");
 
 export async function launchBrowser(): Promise<Browser> {
   if (isProduction) {
-    const executablePath = path.join(process.cwd(), "chromium", "chromium");
+    const executablePath = path.join(process.cwd(), "chromium", "chromium"); 
 
     return await puppeteer.launch({
       args: chromium.args,
-      executablePath,
+      executablePath: localChromiumPath,
       headless: chromium.headless,
     });
   } else {
