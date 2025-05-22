@@ -5,7 +5,7 @@ import { getCachedCompanyInfo } from "../lib/cache/companyInfoCache";
 import { User } from "@/app/utils/types/entities";
 import { PdfField } from "@/app/utils/types/formTypes";
 import { appStrings } from "@/app/utils/AppContent";
-import { launchBrowser } from "../utils/puppeteerBrowser";
+import { launchBrowser } from "../utils/launchBrowser";
 
 const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) => {    
     
