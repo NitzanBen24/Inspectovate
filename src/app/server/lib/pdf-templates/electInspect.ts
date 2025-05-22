@@ -181,10 +181,7 @@ export function generateHtml({
                         <span class="text-bold">בודק חשמל מוסמך</span>
                         <span class="text-bold mb-6"></span>
                         <span class="">רישיון בודק מס׳ </span><span class="text-bold"> ${formFields.find(field => field.name === 'plicense')?.value || ''}</span>
-                    </div>
-                    <div class="section">
-                        <img src="data:image/png;base64,${base64String}" style="width: 200px;" />
-                    </div>
+                    </div>                    
                 </div>
             </div>
 
