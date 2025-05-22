@@ -1,8 +1,0 @@
-{
-    "build": {
-      "env": {
-        "PUPPETEER_SKIP_DOWNLOAD": "false"
-      }
-    }
-  }
-  
