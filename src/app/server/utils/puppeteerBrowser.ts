@@ -12,7 +12,7 @@ const isProduction = process.env.VERCEL;
 
 // // Define local Chromium binary path (adjust if needed)
 // const localChromiumPath = path.join("/var/task/public/chromium/chromium");
-const localChromiumPath = path.join(__dirname, "../../../chromium/chromium/chromium");
+const localChromiumPath = path.join(__dirname, "../../../chromium");
 
 export async function launchBrowser(): Promise<Browser> {
   if (isProduction) {
