@@ -1,10 +1,26 @@
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false, // Strict Mode enabled by default
-    webpack(config) {
-        config.resolve.alias['@fortawesome/fontawesome-svg-core/styles.css'] = '@fortawesome/fontawesome-svg-core';
-        return config;
-      },
+  reactStrictMode: false,
+  webpack(config) {
+    config.plugins.push(
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: path.resolve('node_modules/@sparticuz/chromium/bin'),
+            to: path.resolve('.next/server/app/api/bin'),
+          },
+        ],
+      })
+    );
+
+    config.resolve.alias['@fortawesome/fontawesome-svg-core/styles.css'] =
+      '@fortawesome/fontawesome-svg-core';
+
+    return config;
+  },
 };
 
 export default nextConfig;

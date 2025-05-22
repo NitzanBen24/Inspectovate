@@ -3,7 +3,7 @@ import chromium from "@sparticuz/chromium";
 
 // Detect environment
 const isProduction = process.env.VERCEL;
-console.log('check.this!!',isProduction)
+
 export async function launchBrowser(): Promise<Browser> {
   if (isProduction) {
     return await puppeteer.launch({

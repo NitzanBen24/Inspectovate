@@ -23,6 +23,7 @@
     "axios": "^1.8.2",
     "bootstrap": "^5.3.3",
     "cookie": "^1.0.1",
+    "copy-webpack-plugin": "^13.0.0",
     "jsonwebtoken": "^9.0.2",
     "next": "^14.2.24",
     "nodemailer": "^6.10.0",
