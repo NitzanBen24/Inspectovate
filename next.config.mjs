@@ -13,7 +13,7 @@ const nextConfig = {
   },
   experimental: {
     outputFileTracingIncludes: {
-      './src/app/api/': [
+      './src/app/api/generate-pdf/': [
         resolve(__dirname, 'node_modules', '@sparticuz', 'chromium-min', 'bin', 'chromium.br'),
       ],
     },
