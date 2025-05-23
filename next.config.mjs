@@ -4,7 +4,14 @@ import path from 'path';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  webpack(config) {        
+  webpack(config) {     
+    
+    // // Ignore source map files
+    // config.module.rules.push({
+    //   test: /\.map$/,
+    //   use: 'ignore-loader',
+    // });
+    
     config.resolve.alias['@fortawesome/fontawesome-svg-core/styles.css'] =
       '@fortawesome/fontawesome-svg-core';
 

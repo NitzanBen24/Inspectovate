@@ -6,7 +6,8 @@ import { User } from "@/app/utils/types/entities";
 import { PdfField } from "@/app/utils/types/formTypes";
 import { appStrings } from "@/app/utils/AppContent";
 import { launchBrowser } from "../utils/puppeteerBrowser";
-//import { launchBrowser } from "../utils/launchBrowser";
+
+///./node_modules/@sparticuz/chromium/build/index.js:224:19
 
 const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) => {    
     
@@ -28,12 +29,13 @@ const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) =>
 
 const _getfileName = (fields: PdfField[], today: string) => {
 
-    return fields.find(field => field.name === 'site')?.value || '' + '-' + 
-            fields.find(field => field.name === 'system')?.value || '' + '-' +
-            fields.find(field => field.name === 'location')?.value || '' + '-' +
-            today;
+    return (
+        (fields.find(f => f.name === 'site')?.value || '') + '-' +
+        (fields.find(f => f.name === 'system')?.value || '') + '-' +
+        (fields.find(f => f.name === 'location')?.value || '') + '-' +
+        today
+    )
 }
-
 
 export async function handleDynamicSend(payload: any) {
 
@@ -47,6 +49,7 @@ export async function handleDynamicSend(payload: any) {
         const companyInfo = await getCachedCompanyInfo(payload.user.company_id);        
         const updatedFormFields = await _addUserInfo(payload.user, payload.staticFields, companyInfo);        
         const today = formatDateRTL(new Date()).toString();
+        
         const html = generateHtml({ date: today, formFields: updatedFormFields, blocks: payload.dynamicBlocks });
 
         const browser = await launchBrowser();
