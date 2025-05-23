@@ -7,6 +7,7 @@ export async function launchBrowser() {
 
     if (isProduction) {
         const executablePath = await chromium.executablePath();
+        console.log('Chromium executablePath:!!', executablePath);
 
         const { default: puppeteerCore } = await import('puppeteer-core');
         
