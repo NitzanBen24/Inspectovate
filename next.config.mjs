@@ -1,21 +1,22 @@
-import CopyWebpackPlugin from 'copy-webpack-plugin';
-import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
-/** @type {import('next').NextConfig} */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const nextConfig = {
   reactStrictMode: false,
-  webpack(config) {     
-    
-    // // Ignore source map files
-    // config.module.rules.push({
-    //   test: /\.map$/,
-    //   use: 'ignore-loader',
-    // });
-    
+  webpack(config) {
     config.resolve.alias['@fortawesome/fontawesome-svg-core/styles.css'] =
       '@fortawesome/fontawesome-svg-core';
-
     return config;
+  },
+  experimental: {
+    outputFileTracingIncludes: {
+      './src/app/api/': [
+        resolve(__dirname, 'node_modules', '@sparticuz', 'chromium-min', 'bin', 'chromium.br'),
+      ],
+    },
   },
 };
 
