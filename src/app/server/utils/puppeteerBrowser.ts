@@ -1,4 +1,4 @@
-import chromium from '@sparticuz/chromium';
+import chromium from '@sparticuz/chromium-min';
 
 
 export async function launchBrowser() {
