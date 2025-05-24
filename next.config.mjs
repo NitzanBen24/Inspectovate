@@ -12,10 +12,6 @@ const nextConfig = {
 
     return config;
   },
-  experimental: {
-    // Next.js 14 experimental flag for app dir (if used)
-    appDir: true,
-  },
   // Make sure to include chromium binaries folder in output if needed (Vercel specifics)
   output: 'standalone', 
 };
