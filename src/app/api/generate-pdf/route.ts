@@ -21,9 +21,6 @@ async function _launchBrowser() {
    
         if (isProduction) {
 
-            
-            console.log("Executable path", await chromium.executablePath());
-
             const executablePath = await chromium.executablePath();
             
             console.log('Chromium executablePath:', executablePath);
