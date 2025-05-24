@@ -5,10 +5,10 @@ const nextConfig = {
       '@fortawesome/fontawesome-svg-core';
     
     // Add chromium-min binaries to be included in the build output
-    config.module.rules.push({
-      test: /\.node$/,
-      loader: 'node-loader',
-    });
+    // config.module.rules.push({
+    //   test: /\.node$/,
+    //   loader: 'node-loader',
+    // });
 
     return config;
   },
