@@ -17,13 +17,13 @@ import { sendDynamicPdf } from '@/app/server/services/emailService';
 async function _launchBrowser() {
     const isProduction = process.env.VERCEL === '1';
     
-    console.log("Running on Vercel?", process.env.VERCEL === '1');
+        console.log("Running on Vercel?", process.env.VERCEL === '1');
    
         if (isProduction) {
 
+            console.log('Chromium executablePath:', await chromium.executablePath());
+
             const executablePath = await chromium.executablePath();
-            
-            console.log('Chromium executablePath:', executablePath);
 
             const { default: puppeteerCore } = await import('puppeteer-core');
             
