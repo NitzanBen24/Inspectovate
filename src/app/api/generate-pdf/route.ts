@@ -17,11 +17,12 @@ import { sendDynamicPdf } from '@/app/server/services/emailService';
 async function _launchBrowser() {
     const isProduction = process.env.VERCEL === '1';
     
-   // try{
+    console.log("Running on Vercel?", process.env.VERCEL === '1');
+   
         if (isProduction) {
 
-            console.log("Running on Vercel!!", process.env.VERCEL === '1');
-            console.log("Executable path!!", await chromium.executablePath());
+            
+            console.log("Executable path", await chromium.executablePath());
 
             const executablePath = await chromium.executablePath();
             
@@ -41,10 +42,6 @@ async function _launchBrowser() {
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             });
         }
-    // } catch(err) {
-    //     console.error('Error: lunching puppeteer browser!', err)
-    //     return {}
-    // }
 }
 
 
