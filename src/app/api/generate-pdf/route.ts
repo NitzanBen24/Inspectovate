@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     
     try {
 
-        const payload = await req.json();    
+        const payload = await req.json();
     
         if (!payload) {
             return NextResponse.json({ error: "Missing payload data!" }, { status: 400 });
