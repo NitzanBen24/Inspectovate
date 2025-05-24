@@ -19,6 +19,10 @@ async function _launchBrowser() {
     
    // try{
         if (isProduction) {
+
+            console.log("Running on Vercel!!", process.env.VERCEL === '1');
+            console.log("Executable path!!", await chromium.executablePath());
+
             const executablePath = await chromium.executablePath();
             
             console.log('Chromium executablePath:', executablePath);
