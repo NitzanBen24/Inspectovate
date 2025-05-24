@@ -20,43 +20,6 @@ export function generateHtml({
         <style>
             @page { margin: 40px; }
             body { font-family: Arial, sans-serif; padding: 0; }
-            
-        </style>
-      </head>
-      <body>
-        <div class="section mt-20">
-                    <p class="bold-underline">לאחר בדיקת התוצאות אשר התקבלו הריני מאשר מתקן זה</p>
-                    <div class="row">
-                        <div class="section">
-                            <span class="text-bold mb-6">בברכה</span>
-                            <span class="text-bold"> ניצן</span>
-                            <span class="text-bold">בודק חשמל מוסמך</span>
-                            <span class="text-bold mb-6"></span>
-                        </div>
-                        
-                    </div>
-                </div>
-      </body>
-    </html>
-    `;
-  }
-
-export function generateHtmlX({
-    date, 
-    formFields,
-    blocks,
-  }: {
-    date: string;
-    formFields: PdfField[];    
-    blocks: EmberBlock[];
-  }) {
-    return `
-    <html dir="rtl">
-      <head>
-        <meta charset="utf-8" />
-        <style>
-            @page { margin: 40px; }
-            body { font-family: Arial, sans-serif; padding: 0; }
             .pdf-wrapper { padding: 40px; }
             .block { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; page-break-inside: avoid; }
             .text-blue { color: #0070c0; }
