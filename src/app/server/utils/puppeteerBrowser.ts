@@ -12,10 +12,11 @@ export async function launchBrowser() {
     console.log('Launching browser!!:')
 	console.log('CWD:', process.cwd());
 	console.log('Expected chromium binary!!:', path.resolve(process.cwd(), 'node_modules/@sparticuz/chromium/bin/chromium.br'));
-	
+
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : await chromium.executablePath(); // ✅ with parentheses
+    : path.resolve(process.cwd(), 'node_modules/@sparticuz/chromium/bin/chromium.br');
+	//: await chromium.executablePath(); // ✅ with parentheses
 
   	console.log('executablePath', executablePath); // 🔍 Add this log
 
