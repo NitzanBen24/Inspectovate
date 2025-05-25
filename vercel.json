@@ -1,6 +1,6 @@
 {
     "functions": {
-      ".next/server/app/api/generate-pdf/route.js": {
+      "app/api/generate-pdf/route.js": {
         "maxDuration": 30,
         "memory": 1024,
         "includeFiles": "node_modules/@sparticuz/chromium/bin/chromium.br"
