@@ -7,8 +7,6 @@ import { PdfField } from "@/app/utils/types/formTypes";
 import { appStrings } from "@/app/utils/AppContent";
 import { launchBrowser } from "../utils/puppeteerBrowser";
 
-///./node_modules/@sparticuz/chromium/build/index.js:224:19
-
 const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) => {    
     
     const fieldMap: { name: keyof typeof companyInfo; value: string | undefined }[] = [
@@ -53,13 +51,13 @@ export async function handleDynamicSend(payload: any) {
         const html = generateHtml({ date: today, formFields: updatedFormFields, blocks: payload.dynamicBlocks });
 
         const browser = await launchBrowser();
-          
+        
         try {
             const page = await browser.newPage(); 
             // todo check what returns
             await page.setContent(html, { waitUntil: 'networkidle0' });
 
-            const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+            const pdfBuffer = await page.pdf({ format: 'a4', printBackground: true });
             const nodeBuffer = Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(Uint8Array.from(pdfBuffer));
             
             const filename = _getfileName(updatedFormFields, today);     
@@ -67,7 +65,7 @@ export async function handleDynamicSend(payload: any) {
             const sendResult = await sendDynamicPdf(nodeBuffer, companyInfo['report_email'], filename);
             
             return { success: true, message: appStrings.email.success }
-        } finally {
+        } finally {            
             await browser.close();
         }
 
