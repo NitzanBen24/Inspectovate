@@ -3,10 +3,7 @@
       "app/api/generate-pdf/route.js": {
         "maxDuration": 30,
         "memory": 1024,
-        "includeFiles": [
-          ".next/standalone/**",
-          "node_modules/@sparticuz/chromium/bin/**"
-        ]
+        "includeFiles": ".next/standalone/**"
       }
     }
 }
