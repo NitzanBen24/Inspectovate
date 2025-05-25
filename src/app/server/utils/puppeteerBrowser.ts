@@ -10,7 +10,9 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 export async function launchBrowser() {
     console.log('Launching browser!!:')
-
+	console.log('CWD:', process.cwd());
+	console.log('Expected chromium binary!!:', path.resolve(process.cwd(), 'node_modules/@sparticuz/chromium/bin/chromium.br'));
+	
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
     : await chromium.executablePath(); // ✅ with parentheses
@@ -29,8 +31,6 @@ export async function launchBrowser() {
           defaultViewport: null, // or your preferred viewport
         });
       } else {
-        console.log('CWD:', process.cwd());
-        console.log('Expected chromium binary!!:', path.resolve(process.cwd(), 'node_modules/@sparticuz/chromium/bin/chromium.br'));
         // Production with chrome-aws-lambda Chromium
         const executablePath = await chromium.executablePath();
         console.log('executablePath!!:',executablePath)
