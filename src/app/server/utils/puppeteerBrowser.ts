@@ -5,7 +5,7 @@ import puppeteerCore from 'puppeteer-core';
 const isDev = process.env.NODE_ENV !== 'production';
 
 export async function launchBrowser() {
-    
+    console.log('Launching browser!!:')
     if (isDev) {
         // Use local Chrome with default args (or minimal args)
         const executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -19,6 +19,7 @@ export async function launchBrowser() {
       } else {
         // Production with chrome-aws-lambda Chromium
         const executablePath = await chromium.executablePath;
+        console.log('executablePath!!:',executablePath)
         return puppeteerCore.launch({
           args: chromium.args,
           defaultViewport: chromium.defaultViewport,
