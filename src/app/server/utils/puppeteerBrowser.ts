@@ -26,8 +26,8 @@ export async function launchBrowser() {
           defaultViewport: null, // or your preferred viewport
         });
       } else {
-        const executablePath = await chromium.executablePath();
-        console.log('executablePath!!:',executablePath)
+        // const executablePath = await chromium.executablePath();
+        // console.log('executablePath!!:',executablePath)
         return puppeteer.launch({
           args: chromium.args,
           defaultViewport: chromium.defaultViewport,
