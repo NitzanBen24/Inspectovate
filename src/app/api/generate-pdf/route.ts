@@ -12,13 +12,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium-min';
 
-export async function _launchBrowser() {
-    return await puppeteer.launch({
-        args: chromium.args,        
-        executablePath: await chromium.executablePath(),
-        headless: true,
-      });
-}
+// export async function _launchBrowser() {
+//     return await puppeteer.launch({
+//         args: chromium.args,        
+//         executablePath: await chromium.executablePath(),
+//         headless: true,
+//       });
+// }
 
 
 const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) => {    
@@ -102,7 +102,7 @@ async function _handleDynamicSend(payload: any) {
         
         const html = _generateHtml({ date: today, formFields: updatedFormFields, blocks: payload.dynamicBlocks });
 
-        const browser = await _launchBrowser();
+        const browser = await launchBrowser();
           
         try {
             const page = await browser.newPage(); 
