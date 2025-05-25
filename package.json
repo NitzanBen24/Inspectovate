@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postbuild": "mkdir -p .next/standalone/.next/server/app/api/generate-pdf && cp -r node_modules/@sparticuz/chromium-min/bin .next/standalone/.next/server/app/api/generate-pdf"
+    "lint": "next lint"
   },
   "engines": {
     "node": ">=18"
