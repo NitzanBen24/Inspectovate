@@ -3,6 +3,7 @@
 // import puppeteerCore from 'puppeteer-core';
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
+import path from 'path';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -11,7 +12,10 @@ export async function launchBrowser() {
 	
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : await chromium.executablePath(); 	
+    : path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/chromium.br' );
+	//: await chromium.executablePath(); 	
+
+	
 
     if (isDev) {
         // Use local Chrome with default args (or minimal args)        
