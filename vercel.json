@@ -3,7 +3,7 @@
       "app/api/generate-pdf/route": { 
         "maxDuration": 30,
         "memory": 1024,
-        "includeFiles": "node_modules/@sparticuz/chromium/bin/**"
+        "includeFiles": "vendor/chromium/**"
       }
     }
 }
