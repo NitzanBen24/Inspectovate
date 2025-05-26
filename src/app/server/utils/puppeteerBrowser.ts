@@ -4,6 +4,7 @@
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 import path from 'path';
+import fs from "fs";
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -11,6 +12,8 @@ export async function launchBrowser() {
     console.log('Launching browser!!:')
 
 	console.log('executablePath!!:',path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' ))
+	console.log("Chromium exists!!:", fs.existsSync("/var/task/node_modules/@sparticuz/chromium/bin/chromium.br"));
+
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
     : await chromium.executablePath(); 	
