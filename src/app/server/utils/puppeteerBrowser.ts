@@ -9,11 +9,13 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 export async function launchBrowser() {
     console.log('Launching browser!!:')
-	
+
+	console.log('executablePath!!:',path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' ))
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' );
-	//: await chromium.executablePath(); 	
+    : await chromium.executablePath(); 	
+	//: path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' );
+	
 
 	
 
@@ -27,7 +29,7 @@ export async function launchBrowser() {
         });
       } else {
         // const executablePath = await chromium.executablePath();
-        // console.log('executablePath!!:',executablePath)
+        console.log('executablePath!!:',executablePath)
         return puppeteer.launch({
           args: chromium.args,
           defaultViewport: chromium.defaultViewport,
