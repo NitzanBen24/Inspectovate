@@ -16,10 +16,10 @@ export async function launchBrowser() {
 
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : path.join(process.cwd(), 'vendor/chromium/chromium.br');
-
+    : path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' );
+	
+	//: path.join(process.cwd(), 'vendor/chromium/chromium.br');
 	//: await chromium.executablePath(); 	
-	//: path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' );
 	
 
 	
