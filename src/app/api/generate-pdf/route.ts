@@ -16,16 +16,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing payload data!" }, { status: 400 });
         }
 
-        try {
-            const executablePath = await chromium.executablePath();
-            if (!executablePath) {
-              return new Response('Chromium executablePath is undefined', { status: 500 });
-            }
-            return new Response(`Chromium executable path: ${executablePath}`, { status: 200 });
-          } catch (error:any) {
-            return new Response(`Error: ${error.message}`, { status: 500 });
-          }
-
         const result = await sendDynamicForm(payload);        
         
         if (!result.success) {

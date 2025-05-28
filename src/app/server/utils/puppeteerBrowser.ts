@@ -17,12 +17,8 @@ export async function launchBrowser() {
         });
 	} 
 	  
-	console.log('executablePath!!:',path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/'))
-	//console.log('Chromium path:', await chromium.executablePath());
-
 	// Production: use @sparticuz/chromium
-	const executablePath = path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/');
-	//await chromium.executablePath();
+	const executablePath = await chromium.executablePath();
 	
 	if (!executablePath) {
 		throw new Error("Chromium executablePath is undefined. Deployment may be missing binary.");
