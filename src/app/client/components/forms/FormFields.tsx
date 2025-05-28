@@ -138,7 +138,7 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
                                     field={ field } 
                                     provider= { provider }                                    
                                     dropdownChange={ handleDropdownChange }
-                                    changeRequired={showTechInfoFields}
+                                    changeRequired={ showTechInfoFields }
                                     />                                    
                             ))}                    
                         </div>                        
