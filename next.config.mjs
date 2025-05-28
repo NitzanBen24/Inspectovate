@@ -4,10 +4,10 @@ const nextConfig = {
     config.resolve.alias['@fortawesome/fontawesome-svg-core/styles.css'] =
       '@fortawesome/fontawesome-svg-core';
 
-    config.module.rules.push({
-      test: /\.js\.map$/,
-      use: 'ignore-loader',
-    });
+    // config.module.rules.push({
+    //   test: /\.js\.map$/,
+    //   use: 'ignore-loader',
+    // });
 
     return config;
   },
