@@ -11,12 +11,13 @@ const isDev = process.env.NODE_ENV !== 'production';
 export async function launchBrowser() {
     console.log('Launching browser!!:')
 
-	console.log('executablePath!!:',path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' ))
-	console.log("Chromium exists!!:", fs.existsSync("/var/task/node_modules/@sparticuz/chromium/bin/chromium.br"));
+	console.log('executablePath!!:',path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/'))
+	//console.log("Chromium exists!!:", fs.existsSync("/var/task/node_modules/@sparticuz/chromium/bin/"));
+	//console.log('chromium.executablePath',await chromium.executablePath())
 
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : 'node_modules/@sparticuz/chromium/bin/'
+    : path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/')
 	
 	//: await chromium.executablePath(); 	
 
