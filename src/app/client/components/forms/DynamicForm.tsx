@@ -131,6 +131,7 @@ const DynamicForm = ({ user }: Props) => {
                                 field={ field } 
                                 provider= { '' }                                    
                                 dropdownChange={ ()=>{} }
+                                changeRequired= {() => {}}
                             />
                 })}            
 
