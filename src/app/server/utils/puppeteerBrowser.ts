@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
+import path from 'path';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -16,8 +17,12 @@ export async function launchBrowser() {
         });
 	} 
 	  
+	console.log('executablePath!!:',path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/'))
+	//console.log('Chromium path:', await chromium.executablePath());
+
 	// Production: use @sparticuz/chromium
-	const executablePath = await chromium.executablePath();
+	const executablePath = path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/');
+	//await chromium.executablePath();
 	
 	if (!executablePath) {
 		throw new Error("Chromium executablePath is undefined. Deployment may be missing binary.");
