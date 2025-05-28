@@ -1,11 +1,11 @@
-import { generateHtml } from "../lib/pdf-templates/electInspect";
+import { generateHtml } from "@/app/server/lib/pdf-templates/electInspect"
 import { formatDateRTL } from "../utils";
 import { sendDynamicPdf } from "./emailService";
-import { getCachedCompanyInfo } from "../lib/cache/companyInfoCache";
+import { getCachedCompanyInfo } from "@/app/server/lib/cache/companyInfoCache";
 import { User } from "@/app/utils/types/entities";
 import { PdfField } from "@/app/utils/types/formTypes";
 import { appStrings } from "@/app/utils/AppContent";
-import { launchBrowser } from "../utils/puppeteerBrowser";
+import { launchBrowser } from "@/app/server/utils/puppeteerBrowser";
 
 const _addUserInfo = async (user: User, fields: PdfField[], companyInfo: any) => {    
     
