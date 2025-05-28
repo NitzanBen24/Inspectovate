@@ -1,6 +1,8 @@
 import { sendDynamicForm } from '@/app/server/actions/dynamicFormActions';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 
 export async function POST(req: NextRequest) {
     
