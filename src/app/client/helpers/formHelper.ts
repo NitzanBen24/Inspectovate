@@ -71,7 +71,7 @@ export const addInspectionFields = (formFields: PdfField[], formRef: React.Mutab
 
 export const dynamicForms: string[] = ['bizpermit', 'firehoses', 'workpermit', 'fireequip']
 
-export const getNewFormBlock = (formName: string, index: number) => {            
+export const getFormBlock = (formName: string, index: number) => {            
     return tblFormFieldMap[formName+'tbl'].map(fieldName => {                    
             return {
                 name: fieldName.endsWith('-ls') ? fieldName.replace('-ls', index+'-ls') : fieldName + index,

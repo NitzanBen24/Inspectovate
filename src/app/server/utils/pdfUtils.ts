@@ -19,44 +19,52 @@ export const reverseEnglishAndNumbers = (text: string): string  => {
 export const pdfFillerFields: any = {
 
     'PDFTextField': (fieldName: string, pdfForm: PDFForm, form: PdfForm, hfont: PDFFont, efont: PDFFont, bold: PDFFont) => {
-        
-        const textField = pdfForm.getTextField(fieldName);
-                    
-        if (!textField) return; // Ensure field exists before setting values
+        try {
+            const textField = pdfForm.getTextField(fieldName);
+                        
+            if (!textField) return; // Ensure field exists before setting values
 
 
-        let formField = form.formFields.find((item: PdfField) => item.name === fieldName);
+            let formField = form.formFields.find((item: PdfField) => item.name === fieldName);
 
-        if (formField === undefined || formField.value?.length === 0) {
-            return;
-        }
-
-        let fieldText = formField.value || '';
-
-        const hasHebrew = _containsHebrew(fieldText);
-        const hasDigits = _containsDigits(fieldText);
-
-        if (hasHebrew && hasDigits) {      
-            fieldText = _reverseNumbersInHebrewText(fieldText);
-        }
-
-        textField.setText(fieldText);
-
-        if (hasHebrew) {
-            textField.setAlignment(TextAlignment.Right);
-            textField.updateAppearances(hfont);
-        } else {
-            textField.setAlignment(TextAlignment.Left);
-            textField.updateAppearances(efont);
-            
-            // todo refactor, remove this from here
-            if (fieldName === 'filenum' || fieldName === 'regnum') {
-                textField.updateAppearances(bold);
+            if (formField === undefined || formField.value?.length === 0) {
+                return;
             }
-        }
+
+            let fieldText = formField.value || '';
+
+            const hasHebrew = _containsHebrew(fieldText);
+            const hasDigits = _containsDigits(fieldText);
+
+            if (hasHebrew && hasDigits) {      
+                fieldText = _reverseNumbersInHebrewText(fieldText);
+            }
+
+            textField.setText(fieldText);
+
+            if (hasHebrew) {
+                textField.setAlignment(TextAlignment.Right);
+                textField.updateAppearances(hfont);
+            } else {
+                textField.setAlignment(TextAlignment.Left);
+                textField.updateAppearances(efont);
+                
+                // todo refactor, remove this from here
+                if (fieldName === 'filenum' || fieldName === 'regnum') {
+                    textField.updateAppearances(bold);
+                }
+            }
+        } catch (err: any) {
+            console.error('Error: in TextField conversion:!')
+        } 
     },
-    'PDFCheckBox': (pdfForm: PDFForm, formFields: PdfField[]) => {              
-        formFields.forEach(field => pdfForm.getCheckBox(field.name + '_' + field.value).check());
+    'PDFCheckBox': (pdfForm: PDFForm, formFields: PdfField[]) => {    
+        try {
+            // todo: if no value thers an error
+            formFields.forEach(field => pdfForm.getCheckBox(field.name + '_' + field.value).check());
+        } catch (err: any) {
+            console.error('Error: in CheckBox conversion:!  ' + err.message, err)
+        } 
     }
 }
 

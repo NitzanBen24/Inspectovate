@@ -4,15 +4,20 @@ import path from 'path';
 import fontkit from '@pdf-lib/fontkit';
 import { PdfField, PdfForm } from "@/app/utils/types/formTypes";
 import { pdfFillerFields, pdfFormFields, reverseEnglishAndNumbers } from '../utils/pdfUtils';
+import { appStrings } from '@/app/utils/AppContent';
 
 
 function _extraFields(fileName: string): PdfField[] {
     
-    const excludeComments = ['bizpermit', 'schindler', 'firehoses', 'workpermit', 'fireequip']
+    const excludeComments = ['bizpermit', 'firehoses', 'workpermit', 'fireequip']
     const moreFields = [];
 
     if (fileName === 'inspection') {
         moreFields.push('message', 'provider','batteries','capacity', 'bmanufacture');
+    }
+
+    if (fileName === 'elevator' || fileName === 'schindler' || fileName === 'charge') {
+        moreFields.push('provider')
     }
 
     if (!excludeComments.includes(fileName)) {
@@ -256,6 +261,31 @@ const _getFormFields = (pdfForm: PDFForm, formName: string): PdfField[] => {
     return [...fields, ...checkFields, ...tblFields];
 };
 
+const _elevatorCheck = (fields: PdfField[], formName: string) => {
+    
+    if (formName === 'schindler') {
+        fields.push({
+            name: 'customer',
+            type: 'PDFTextField',
+            require: true,
+            value: 'שינדלר'
+        });
+    }
+
+    if (fields.find(field => field.name === 'status')?.value === 'incomplete') {        
+        const commentIndex = fields.findIndex(field => field.name === 'comments');
+        if (commentIndex !== -1) {
+            const existingValue = fields[commentIndex].value || '';
+            fields[commentIndex] = {
+                ...fields[commentIndex],
+                value: appStrings.schindler.fail + existingValue,
+            };
+        }
+    }
+
+    return fields
+}
+
 // Get PDF files
 export const getPdfForms = async (fileNames: string[]): Promise<{ forms: PdfForm[], success: boolean, error?: unknown }> => {
     const forms: PdfForm[] = []; 
@@ -323,31 +353,10 @@ export const generateDocumnet = async (form: PdfForm): Promise<Uint8Array | []> 
         const pdfForm = pdfDoc.getForm();
     
         _fillPdfFields(pdfForm, form, hebrewFont, openSunsFont, boldFont);
-    
-        // only for ispections form
-        // if (form.name === 'inspection') {    
-        //     _markInspectionResult(pdfForm, pdfDoc, form.formFields, boldFont)        
-        // }
-
-        //todo: move this to a seperate function
-        // Add customer field to formFields
-        if (form.name === 'schindler') {
-            form.formFields.push({
-                name: 'customer',
-                type: 'PDFTextField',
-                require: true,
-                value: 'שינדלר'
-              })
-        }
-        if (form.name === 'bizpermit') {            
-            form.formFields.push({
-                name: 'customer',
-                type: 'PDFTextField',
-                require: true,
-                value: form.formFields.find(field => field.name === 'regnum')?.value || 'bizpermit',
-              })
-        }
         
+        form.formFields = _elevatorCheck(form.formFields, form.name)
+        
+        /** todo: first add comment to schindler, than dont add 2 empty pages if therse no images */
         const pageCount = pdfDoc.getPageCount();    
         let lastPage: PDFPage | null = null;
     

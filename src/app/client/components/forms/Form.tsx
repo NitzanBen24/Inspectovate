@@ -60,7 +60,7 @@ const Form = ({ form, close }: Props) => {
         });
     }, [form.formFields])
 
-   // console.log('Form.render=>',form)
+    //console.log('Form.render=>',form)
 
     const handleSubmitSuccess = (res: any) => {   
         
@@ -69,11 +69,7 @@ const Form = ({ form, close }: Props) => {
             sendMail.current = true;
             submitForm(form);
         } else {
-            setLoading(false);            
-            if (res.success) {
-                clearAttchedFiles();
-                cleanForm();
-            }            
+            setLoading(false);                               
             setMessage(res.message); 
             openModal();        
         }
@@ -136,7 +132,7 @@ const Form = ({ form, close }: Props) => {
         });
         
         //inspections form only
-        if (form.name === 'inspection') {// || form.name === 'בדיקה'
+        if (form.name === 'inspection') {
             const fieldsToRemove = ['status'];
             form.formFields = form.formFields.filter((item) => !fieldsToRemove.includes(item.name));    
         }        
@@ -191,20 +187,25 @@ const Form = ({ form, close }: Props) => {
             const ppower = calcPower(formRef.current);
             if (ppower) {
                 setFields([{['ppower']: ppower.toString()}]);
-            }
-
-            // Inspections result
-            let statusVal = formRef.current?.querySelector<HTMLInputElement>('[name="status"]:checked')?.value;
-            if (statusVal) {
-                form.formFields.push({
-                    name: 'status',
-                    type: 'TextArea',
-                    require:false,
-                    value:statusVal,
-                })
-            } 
+            }            
         }
         
+        // test result
+        let statusVal = formRef.current?.querySelector<HTMLInputElement>('[name="status"]:checked')?.value;            
+        if (statusVal) {                     
+
+            if (form.name === 'inspection' && statusVal === 'incomplete') {
+                form.name = 'inspectionfail';
+            }
+
+            form.formFields.push({
+                name: 'status',
+                type: 'TextArea',
+                require:false,
+                value:statusVal,
+            })
+        } 
+
         setDate();        
 
     }
@@ -312,8 +313,14 @@ const Form = ({ form, close }: Props) => {
         
         <div className='mx-auto p-2 form-wrap'  key={form.name+'.form'}>
             <div className='form-head flex'>
-                <div className='p-2'>            
-                    <FontAwesomeIcon icon={faArrowLeft} onClick={goBack} />
+                <div className='p-2 flex justify-between'> 
+                    <div className='flex items-center'>
+                        <FontAwesomeIcon icon={faArrowLeft} onClick={goBack} />
+                    </div>                
+                    <button id='BtnSend' className='w-auto border-2 border-black text-blck px-2 ml-2 rounded-lg' type="button" onClick={cleanForm} disabled={isPending}>
+                        נקה
+                    </button>
+                    
                 </div>
                 <h2 className='text-2xl font-bold flex-grow text-right text-gray-800'>{ getHebrewFormName(form.name) }</h2>
             </div>            
@@ -327,7 +334,7 @@ const Form = ({ form, close }: Props) => {
                     consider move this to seperate file/repo
                 */}
                 {/** change field name stauts to different name, the meaning is if inspection passed or not */}
-                {/* {form.name === 'inspection' && <div className='flex status-wrap mt-3'>
+                {(form.name === 'inspection' || form.name === 'elevator' || form.name === 'schindler') && <div className='flex status-wrap mt-3'>
                     <label className='block text-sm min-w-20 content-center font-medium text-black'>תוצאה:</label>
                     <div className='flex items-center'>
                         <label className='block text-sm content-center font-medium text-black' htmlFor="status-complete">עבר:</label>
@@ -335,7 +342,7 @@ const Form = ({ form, close }: Props) => {
                         <label className='block text-sm content-center font-medium text-black' htmlFor="status-complete">לא עבר:</label>
                         <input className='mx-2' type="radio" name='status' value="incomplete" id='status-incomplete' />
                     </div>                    
-                </div>} */}
+                </div>} 
 
             </div>
 

@@ -45,6 +45,9 @@ export const appStrings = {
   },
   storage: {
     uploadFailed: 'העלאת תמונת נכשלה. נסה שוב מאוחר יותר'
+  },
+  schindler: {
+    fail: 'בדיקה לא עברה, אלו הם הליקויים:\n\n'
   }
   
 }
@@ -68,17 +71,17 @@ export const formFieldMap: Record<string, string[]> = {
     //permit
     permitbiz: ['filenum', 'bizname', 'biztype', 'regnum',  'city', 'street', 'addressnum'],//, 'setdate', 'checkswitch'    
     permitcontact: ['contactname','contactrole', 'contactphone', 'contactemail'],
-	permitrest: ['inspectorname','inspectorid', 'confirmnum', 'setdate', 'checkswitch', 'checkfirehoses'],
+	  permitrest: ['inspectorname','inspectorid', 'confirmnum', 'setdate', 'checkswitch', 'checkfirehoses'],
 	
-	//tables	
-	//workpermit & bizpermit
-	workpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
-	//firehoses
-	firehosestbl: ['tbl_stationnum', 'tbl_stationpos','tbl_dash-ls', 'tbl_eqcabinet-ls', 'tbl_fireroller-ls', 'tbl_fabrichose-ls', 'tbl_comments'],
-    //fireequip
-	extinguisher: ['tbl_serialnum', 'tbl_extinguisherpos', 'tbl_extinguishertype', 'tbl_nominalsize', 'tbl_extingmanu', 'tbl_duedateins', 'tbl_duedatepre', 'tbl_pass', 'tbl_fail', 'tbl_comment'],
-	end: ['comments', 'message'],
-	signature: ['signature'],
+    //tables	
+    //workpermit & bizpermit
+    workpermittbl: ['tbl_panel_pos-ls', 'tbl_panel_num', 'tbl_panel_ampsize', 'tbl_panel_cut-ls', 'tbl_panel_vis-ls', 'tbl_panel_down-ls'],
+    //firehoses
+    firehosestbl: ['tbl_stationnum', 'tbl_stationpos','tbl_dash-ls', 'tbl_eqcabinet-ls', 'tbl_fireroller-ls', 'tbl_fabrichose-ls', 'tbl_comments'],
+      //fireequip
+    extinguisher: ['tbl_serialnum', 'tbl_extinguisherpos', 'tbl_extinguishertype', 'tbl_nominalsize', 'tbl_extingmanu', 'tbl_duedateins', 'tbl_duedatepre', 'tbl_pass', 'tbl_fail', 'tbl_comment'],
+    end: ['comments', 'message'],
+    signature: ['signature'],
 }
 
 export const tblFormFieldMap: Record<string, string[]> = {
@@ -109,7 +112,13 @@ export const fieldsNameMap: any = {
     pmodel: 'הספק פאנל',
     panel: 'שם יצרן',
     electrician: 'חשמלאי',
+    ephone: 'טל׳ חשמלאי',
+    eemail: 'מייל חשמלאי',
+    elicense: 'ריש׳ חשמלאי',
     planner: 'מתכנן',
+    pphone: 'טל׳ מתכנן',
+    pemail: 'מייל מתכנן',
+    plicense: 'ריש׳ מתכנן',
     voltl: 'מתח שלוב',
     voltn: 'מתח פאזי',
     rcurrent: 'פחת',

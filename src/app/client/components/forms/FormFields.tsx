@@ -6,7 +6,7 @@ import Field from './Field';
 import { SearchableDropdownHandle } from './SearchableDropdown';
 import { useTechnician } from '../../hooks/useTechnician';
 import { isStorageForm } from '@/app/utils/helper';
-import { dynamicForms, getNewFormBlock } from '../../helpers/formHelper';
+import { dynamicForms, getFormBlock } from '../../helpers/formHelper';
 
 
 const generateFormBlocks = (staticFields: PdfField[], blocks: FormBlocks[], blockSize: number) => {
@@ -44,9 +44,10 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
     const [ showStorage, setShowStorage ] = useState(false);            
     const [ dynamicBlocks, setdynamicBlocks ] = useState<FormBlocks[]>([]);    
     
-    const dynamicBlocksSize = useRef<number>(1);
     const formFieldsRef = useRef<HTMLDivElement | null>(null);     
-    const formBlocks = useMemo(() => generateFormBlocks(form.formFields, dynamicBlocks, dynamicBlocksSize.current), [form.formFields]);
+    const formBlocks = useMemo(() => generateFormBlocks(form.formFields, dynamicBlocks, dynamicBlocks.length), [form.formFields]);
+
+    //console.log('formFileds.render=>')
 
     useEffect(() => {
         // check if storage form 
@@ -54,7 +55,7 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
             toggleStorageFields();              
         }
     }, [form.formFields]);
-    
+  
     const toggleStorageFields = () => {
         setShowStorage(prev => !prev);
     }
@@ -82,20 +83,35 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
     } 
 
     const addNewFields = () => {        
-        const newFields = getNewFormBlock(form.name, dynamicBlocksSize.current);
-        if (newFields.length) {
-            dynamicBlocksSize.current++;
+        const blockSize = dynamicBlocks.length + 1;        
+        const newFields = getFormBlock(form.name, blockSize);
+        if (newFields.length) {                        
             form.formFields = [...form.formFields, ...newFields];
             setdynamicBlocks((prev) => [
                 ...prev ,
                 {
-                    name: form.name+ 'tbl' + dynamicBlocksSize.current,
+                    name: form.name+ 'tbl' + blockSize,
                     fields: newFields,       
                 }
-            ]);                       
+            ]);                               
         }
     }
 
+    const showTechInfoFields = (fieldName: string) => {
+
+        const checkFeilds = ['eemail', 'ephone', 'elicense','pemail', 'pphone', 'plicense']        
+        
+        const updatedFields = form.formFields.map(field => {
+            const fn = field.name.replace("-ls", "");
+            if (checkFeilds.includes(fn) && fn[0] === fieldName[0]) {
+                return { ...field, require: true };
+            }
+            return field;
+        });
+
+        form.formFields = updatedFields;        
+        setdynamicBlocks((prev) => [...prev]);   
+    }
 
     return (
         <>
@@ -122,6 +138,7 @@ const FormFields = ({ form, updateFields, registerRef }: Props) => {
                                     field={ field } 
                                     provider= { provider }                                    
                                     dropdownChange={ handleDropdownChange }
+                                    changeRequired={showTechInfoFields}
                                     />                                    
                             ))}                    
                         </div>                        

@@ -13,10 +13,11 @@ interface Props {
     field: PdfField;
     registerRef: (ref: SearchableDropdownHandle | null) => void;
     provider: string | boolean;
-    dropdownChange: (value: string, name: string, id?: number) => void;    
+    dropdownChange: (value: string, name: string, id?: number) => void;  
+    changeRequired: (fieldName: string) => void;  
 }
 
-const Field = ({ formName, field, registerRef, provider, dropdownChange }: Props) => {    
+const Field = ({ formName, field, registerRef, provider, dropdownChange, changeRequired }: Props) => {    
 
     const { technicians:techs } = useTechnician();
     const { manufactures: manus } = useManufacture();
@@ -77,6 +78,14 @@ const Field = ({ formName, field, registerRef, provider, dropdownChange }: Props
             </label>               
             
             { FieldType[field.type] || FieldType.TextField}
+
+            { 
+                (field.name === 'planner-ls' || field.name === 'electrician-ls') &&
+                <label key={'storage-lable'} onClick={() => changeRequired(field.name) } className="storage-toggle flex pt-2 content-center text-gray-400 text-sm min-w-10 py-auto font-medium ">
+                    פרטים:                                 
+                </label>  
+
+            }
 
             {formName === 'inspection' && field.name === 'omega' && (
                 <>
