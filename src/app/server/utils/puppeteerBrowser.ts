@@ -12,20 +12,12 @@ export async function launchBrowser() {
     console.log('Launching browser!!:')
 
 	console.log('executablePath!!:',path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/'))
-	//console.log("Chromium exists!!:", fs.existsSync("/var/task/node_modules/@sparticuz/chromium/bin/"));
-	//console.log('chromium.executablePath',await chromium.executablePath())
+	//console.log("Chromium exists!!:", fs.existsSync("/var/task/node_modules/@sparticuz/chromium/bin/"));	
 
     const executablePath = isDev
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : await chromium.executablePath();
-
-	//: path.join(process.cwd(),'node_modules/@sparticuz/chromium/bin/' );
-	//: path.join(process.cwd(), 'vendor/chromium/chromium.br');
-	//
+	: await chromium.executablePath(); 	
 	
-
-	
-
     if (isDev) {
         // Use local Chrome with default args (or minimal args)        
         return puppeteer.launch({
